@@ -339,6 +339,15 @@
         }
       }
 
+      function escapeHtml(s) {
+        return String(s || "")
+          .replaceAll("&", "&amp;")
+          .replaceAll("<", "&lt;")
+          .replaceAll(">", "&gt;")
+          .replaceAll('"', "&quot;")
+          .replaceAll("'", "&#39;");
+      }
+
       function relTime(ts) {
         if (!ts) return "-";
         const d = Date.now() - Number(ts);
@@ -388,11 +397,11 @@
           div.className = "item";
           div.innerHTML = `
             <div class="topline">
-              <div class="who">${t.requestedBy || "-"}</div>
+              <div class="who">${escapeHtml(t.requestedBy || "-")}</div>
               <div class="val">${formatBRL(t.value)}</div>
             </div>
-            <div class="msg">${t.url || "-"}</div>
-            <div class="meta">${t.vip ? "VIP" : "fila"}${t.videoId ? " | yt:" + t.videoId : ""}</div>
+            <div class="msg">${escapeHtml(t.url || "-")}</div>
+            <div class="meta">${t.vip ? "VIP" : "fila"}${t.videoId ? " | yt:" + escapeHtml(t.videoId) : ""}</div>
           `;
           queueEl.appendChild(div);
         }
@@ -406,14 +415,14 @@
           const acts = (d.actions || []).map((a) => a.type).join(", ");
           div.innerHTML = `
             <div class="topline">
-              <div class="who">${d.sender || "-"}</div>
+              <div class="who">${escapeHtml(d.sender || "-")}</div>
               <div class="val">${formatBRL(d.value)}</div>
             </div>
-            <div class="msg">${(d.message || "").replaceAll("<", "&lt;")}</div>
+            <div class="msg">${escapeHtml(d.message || "")}</div>
             <div class="meta">
               <span>${relTime(d.at)} atrás</span>
               ${d.url ? `<span>url</span>` : ""}
-              ${acts ? `<span>actions: ${acts}</span>` : ""}
+              ${acts ? `<span>actions: ${escapeHtml(acts)}</span>` : ""}
             </div>
           `;
           donationsEl.appendChild(div);

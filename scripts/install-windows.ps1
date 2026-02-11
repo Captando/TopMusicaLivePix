@@ -3,7 +3,7 @@
 
   Objetivo:
   - Instalar ferramentas (Git, Node.js LTS, ngrok) via winget (se disponivel)
-  - Clonar o repo (se ainda nao estiver na pasta)
+  - Clonar o repo (HTTPS por padrao, mais simples para streamers)
   - Instalar dependencias (npm i)
   - Criar e configurar .env (gera WEBHOOK_SECRET automaticamente)
 
@@ -19,7 +19,8 @@ Set-StrictMode -Version Latest
 $ErrorActionPreference = "Stop"
 
 param(
-  [string]$RepoSsh = "git@github.com:Captando/TopMusicaLivePix.git",
+  # Repo publico: HTTPS funciona para qualquer streamer sem configurar SSH.
+  [string]$RepoUrl = "https://github.com/Captando/TopMusicaLivePix.git",
   [string]$InstallDir = (Join-Path $env:USERPROFILE "TopMusicaLivePix"),
   [switch]$SkipToolInstall
 )
@@ -156,7 +157,10 @@ try {
     if (-not (Test-Path $InstallDir)) {
       New-Item -ItemType Directory -Path $InstallDir | Out-Null
     }
-    git clone $RepoSsh $InstallDir | Out-Host
+    if ((Get-ChildItem -LiteralPath $InstallDir -Force | Measure-Object).Count -gt 0) {
+      throw "A pasta de instalacao nao esta vazia: $InstallDir"
+    }
+    git clone $RepoUrl $InstallDir | Out-Host
     $repoDir = $InstallDir
   } else {
     Write-Step "Repositorio detectado na pasta atual: $repoDir"
@@ -188,4 +192,3 @@ try {
   Write-Err $_.Exception.Message
   exit 1
 }
-
