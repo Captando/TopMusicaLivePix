@@ -21,6 +21,7 @@ const { AppState } = require("./state");
 const { MinecraftRcon } = require("./actions/minecraft");
 const { MusicManager } = require("./actions/music");
 const { ObsController } = require("./actions/obs");
+const { postJson: postOutboundWebhook } = require("./actions/outboundWebhook");
 const { LivePixApi } = require("./livepixApi");
 const { formatBRL, newId, renderTemplate } = require("./utils");
 const { createVersionService } = require("./version");
@@ -203,6 +204,45 @@ async function main() {
       }
       case "obs.setInputVolume": {
         return obs.setInputVolumeMul(action.inputName, action.volumeMul);
+      }
+      case "webhook.request": {
+        const url = String(action.url || "").trim();
+        const payloadTemplate =
+          action.payload && typeof action.payload === "object" ? action.payload : {};
+
+        const vars = {
+          sender: donation.sender,
+          value: donation.value,
+          valueBRL: formatBRL(donation.value),
+          message: donation.message,
+          url: ctx.url || "",
+          videoId: ctx.videoId || "",
+          donationId: donation.id,
+          isNewTop: ctx.isNewTop ? "true" : "false"
+        };
+
+        // Render string fields recursively with {{vars}} templates.
+        const renderAny = (x) => {
+          if (typeof x === "string") return renderTemplate(x, vars);
+          if (Array.isArray(x)) return x.map(renderAny);
+          if (x && typeof x === "object") {
+            const out = {};
+            for (const [k, v] of Object.entries(x)) out[k] = renderAny(v);
+            return out;
+          }
+          return x;
+        };
+
+        const body = renderAny(payloadTemplate);
+        const headers = renderAny(action.headers || {});
+
+        return postOutboundWebhook({
+          url,
+          body,
+          headers,
+          timeoutMs: action.timeoutMs || cfg.outboundWebhook.timeoutMs,
+          allowHosts: cfg.outboundWebhook.allowHosts
+        });
       }
       default:
         return { ok: false, reason: `unknown_action:${action.type}` };

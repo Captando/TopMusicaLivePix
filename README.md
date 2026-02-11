@@ -124,6 +124,8 @@ node -e "console.log(require('crypto').randomBytes(24).toString('hex'))"
 - `PORT`: porta do servidor (padrão: `3000`)
 - `WEBHOOK_SECRET`: token obrigatório para proteger o endpoint do webhook
 - `WEBHOOK_RATE_LIMIT_WINDOW_MS` e `WEBHOOK_RATE_LIMIT_MAX`: limitador simples de requisições no webhook
+- `OUT_WEBHOOK_ALLOW_HOSTS`: hosts permitidos para ações `webhook.request` (padrão seguro: `127.0.0.1,localhost`)
+- `OUT_WEBHOOK_TIMEOUT_MS`: timeout das chamadas de webhook de saída
 
 LivePix (mapeamento do JSON do webhook, se necessário):
 
@@ -344,11 +346,29 @@ O motor de regras faz:
 - `obs.mediaRestart` (reinicia um Media Source)
 - `obs.setInputMute`
 - `obs.setInputVolume` (usa `volumeMul`, ex: 1.0 = 100%)
+- `webhook.request` (envia POST JSON para um webhook personalizado)
 
 Para SFX:
 
 1. Coloque seus arquivos em `public/sfx/` (mp3/wav)
 2. Referencie no `config/rules.json` como `/sfx/seu-audio.mp3`
+
+Para webhook personalizado:
+
+1. Habilite a regra `custom-webhook-example` no `config/rules.json` (ou crie a sua)
+2. Ajuste `url`, `headers` e `payload`
+3. Liberte o host no `.env` em `OUT_WEBHOOK_ALLOW_HOSTS`
+
+Templates aceitos no payload/headers:
+
+- `{{donationId}}`
+- `{{sender}}`
+- `{{value}}`
+- `{{valueBRL}}`
+- `{{message}}`
+- `{{url}}`
+- `{{videoId}}`
+- `{{isNewTop}}`
 
 ### Recarregar regras sem reiniciar
 

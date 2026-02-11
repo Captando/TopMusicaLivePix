@@ -2,6 +2,12 @@
 
 Este projeto segue (aproximadamente) SemVer.
 
+## v1.2.0 (2026-02-11)
+
+- Nova ação `webhook.request` para enviar POST JSON para webhook personalizado de acordo com a doação
+- Templates de payload/headers (`{{sender}}`, `{{value}}`, `{{valueBRL}}`, `{{message}}`, etc.)
+- Controle de segurança por host permitido (`OUT_WEBHOOK_ALLOW_HOSTS`) e timeout (`OUT_WEBHOOK_TIMEOUT_MS`)
+
 ## v1.1.0 (2026-02-11)
 
 - Integração com OBS WebSocket (trocar de cena, habilitar/desabilitar fonte, atualizar texto, reiniciar Media Source)

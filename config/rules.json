@@ -41,6 +41,31 @@
       ]
     },
     {
+      "id": "custom-webhook-example",
+      "enabled": false,
+      "priority": 92,
+      "when": { "minValue": 1 },
+      "actions": [
+        {
+          "type": "webhook.request",
+          "url": "http://127.0.0.1:8080/hook/donate",
+          "headers": {
+            "x-source": "topmusicalivepix"
+          },
+          "payload": {
+            "event": "donation",
+            "donationId": "{{donationId}}",
+            "sender": "{{sender}}",
+            "value": "{{value}}",
+            "valueBRL": "{{valueBRL}}",
+            "message": "{{message}}",
+            "isNewTop": "{{isNewTop}}",
+            "videoUrl": "{{url}}"
+          }
+        }
+      ]
+    },
+    {
       "id": "new-top-example",
       "enabled": false,
       "priority": 90,

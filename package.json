@@ -1,6 +1,6 @@
 {
   "name": "topmusica-livepix",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Automacao local para streams: LivePix -> musica (fila/VIP), Minecraft (RCON) e overlay para OBS.",
   "main": "src/index.js",
   "scripts": {

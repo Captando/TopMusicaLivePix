@@ -74,6 +74,10 @@ function getConfig() {
       windowMs: envInt("WEBHOOK_RATE_LIMIT_WINDOW_MS", 60_000),
       max: envInt("WEBHOOK_RATE_LIMIT_MAX", 60)
     },
+    outboundWebhook: {
+      allowHosts: envCsv("OUT_WEBHOOK_ALLOW_HOSTS", ["127.0.0.1", "localhost"]),
+      timeoutMs: envInt("OUT_WEBHOOK_TIMEOUT_MS", 3000)
+    },
 
     livepix: {
       valuePath: env("LIVEPIX_VALUE_PATH", ""),
