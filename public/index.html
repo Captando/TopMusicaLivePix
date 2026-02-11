@@ -243,6 +243,8 @@
           <span id="conn">desconectado</span>
           <span class="k">|</span>
           <span id="rulesPath">rules: -</span>
+          <span class="k">|</span>
+          <span id="version">versão: -</span>
         </div>
       </header>
 
@@ -308,6 +310,7 @@
       const dot = document.getElementById("dot");
       const conn = document.getElementById("conn");
       const rulesPath = document.getElementById("rulesPath");
+      const versionEl = document.getElementById("version");
 
       const donationsEl = document.getElementById("donations");
       const donationsEmpty = document.getElementById("donationsEmpty");
@@ -460,6 +463,58 @@
       reloadBtn.addEventListener("click", async () => {
         await fetch("/api/rules/reload", { method: "POST" });
       });
+
+      async function loadVersion() {
+        try {
+          const resp = await fetch("/api/version", { cache: "no-store" });
+          const v = await resp.json();
+          if (!v || !v.ok) {
+            versionEl.textContent = "versão: erro";
+            return;
+          }
+
+          const localSha = v.local?.git?.commitShort || "";
+          const localSubj = v.local?.git?.subject || "";
+          const remoteOk = v.remote?.ok === true;
+          const remoteSha = remoteOk ? v.remote?.commitShort || "" : "";
+          const remoteSubj = remoteOk ? v.remote?.subject || "" : "";
+          const remoteAuthor = remoteOk ? v.remote?.author || "" : "";
+          const remoteDate = remoteOk ? v.remote?.date || "" : "";
+
+          let remoteWhen = "";
+          if (remoteDate) {
+            const d = new Date(remoteDate);
+            if (!Number.isNaN(d.getTime())) {
+              remoteWhen = d.toLocaleString("pt-BR");
+            }
+          }
+
+          let status = "indefinido";
+          if (v.upToDate === true) status = "atualizado";
+          else if (v.upToDate === false) status = "atualização disponível";
+
+          const parts = [];
+          if (v.local?.packageVersion) parts.push(`v${v.local.packageVersion}`);
+          if (localSha) parts.push(`local ${localSha}`);
+          else parts.push("local sem git");
+          if (remoteSha) parts.push(`remoto ${remoteSha}`);
+          parts.push(status);
+
+          const detail =
+            remoteOk && remoteSubj
+              ? ` | último commit: ${remoteSha} ${remoteSubj}${remoteAuthor ? " (" + remoteAuthor + ")" : ""}${remoteWhen ? " • " + remoteWhen : ""}`
+              : remoteOk
+                ? ""
+                : " | não foi possível checar o GitHub";
+
+          versionEl.textContent = `versão: ${parts.join(" · ")}${detail}`;
+        } catch {
+          versionEl.textContent = "versão: erro";
+        }
+      }
+
+      loadVersion();
+      setInterval(loadVersion, 60_000);
     </script>
   </body>
 </html>

@@ -59,6 +59,16 @@ ou
 
 O script tenta instalar `Git`, `Node.js LTS` e `ngrok` via `winget`, instala dependencias e cria o `.env` com `WEBHOOK_SECRET` gerado.
 
+### Atualizar no Windows (baixar ultima versao)
+
+Dentro do repositorio, rode:
+
+- `scripts\\update-windows.bat` (duplo clique)
+ou
+- `powershell -NoProfile -ExecutionPolicy Bypass -File .\\scripts\\update-windows.ps1`
+
+Esse script faz `git fetch/pull` e depois `npm i`.
+
 ### 1) Instalar o Node.js (LTS)
 
 Windows/macOS:

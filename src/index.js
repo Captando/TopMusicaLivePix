@@ -22,6 +22,7 @@ const { MinecraftRcon } = require("./actions/minecraft");
 const { MusicManager } = require("./actions/music");
 const { LivePixApi } = require("./livepixApi");
 const { newId } = require("./utils");
+const { createVersionService } = require("./version");
 
 function openUrl(url) {
   if (!url) return;
@@ -65,6 +66,13 @@ async function main() {
   });
 
   const minecraft = new MinecraftRcon(cfg.minecraft);
+  const version = createVersionService({
+    owner: "Captando",
+    repo: "TopMusicaLivePix",
+    branch: "main",
+    cacheTtlMs: 60_000,
+    rootDir: path.join(__dirname, "..")
+  });
 
   app.use(
     helmet({
@@ -90,6 +98,15 @@ async function main() {
   app.get("/health", (req, res) => res.json({ ok: true, at: Date.now() }));
 
   app.get("/api/state", (req, res) => res.json({ ok: true, state: state.snapshot() }));
+
+  app.get("/api/version", async (req, res) => {
+    try {
+      const info = await version.getVersionInfo();
+      res.json(info);
+    } catch (e) {
+      res.status(500).json({ ok: false, error: String(e?.message || e) });
+    }
+  });
 
   app.post("/api/music/skip", (req, res) => {
     music.skip();

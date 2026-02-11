@@ -42,6 +42,23 @@
               "path": ["api", "state"]
             }
           }
+        },
+        {
+          "name": "GET /api/version",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/version",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "version"]
+            }
+          }
         }
       ]
     },
