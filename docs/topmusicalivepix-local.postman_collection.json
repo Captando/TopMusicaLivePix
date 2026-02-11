@@ -21,8 +21,12 @@
             ],
             "url": {
               "raw": "{{baseUrl}}/health",
-              "host": ["{{baseUrl}}"],
-              "path": ["health"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "health"
+              ]
             }
           }
         },
@@ -38,8 +42,13 @@
             ],
             "url": {
               "raw": "{{baseUrl}}/api/state",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "state"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "state"
+              ]
             }
           }
         },
@@ -55,8 +64,13 @@
             ],
             "url": {
               "raw": "{{baseUrl}}/api/version",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "version"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "version"
+              ]
             }
           }
         }
@@ -77,8 +91,14 @@
             ],
             "url": {
               "raw": "{{baseUrl}}/api/music/skip",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "music", "skip"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "music",
+                "skip"
+              ]
             }
           }
         },
@@ -94,8 +114,14 @@
             ],
             "url": {
               "raw": "{{baseUrl}}/api/music/clear",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "music", "clear"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "music",
+                "clear"
+              ]
             }
           }
         },
@@ -111,8 +137,283 @@
             ],
             "url": {
               "raw": "{{baseUrl}}/api/rules/reload",
-              "host": ["{{baseUrl}}"],
-              "path": ["api", "rules", "reload"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "rules",
+                "reload"
+              ]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Audit / Reports / Moderation",
+      "item": [
+        {
+          "name": "GET /api/audit (24h, limit 30)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/audit?hours=24&limit=30",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "audit"
+              ],
+              "query": [
+                {
+                  "key": "hours",
+                  "value": "24"
+                },
+                {
+                  "key": "limit",
+                  "value": "30"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "GET /api/reports/summary (24h)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/reports/summary?hours=24",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "reports",
+                "summary"
+              ],
+              "query": [
+                {
+                  "key": "hours",
+                  "value": "24"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "GET /api/reports/top-senders (24h)",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/reports/top-senders?hours=24&limit=10",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "reports",
+                "top-senders"
+              ],
+              "query": [
+                {
+                  "key": "hours",
+                  "value": "24"
+                },
+                {
+                  "key": "limit",
+                  "value": "10"
+                }
+              ]
+            }
+          }
+        },
+        {
+          "name": "GET /api/moderation",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/moderation",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "moderation"
+              ]
+            }
+          }
+        },
+        {
+          "name": "POST /api/moderation/senders/block",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"sender\": \"usuario_troll\",\n  \"reason\": \"spam\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/moderation/senders/block",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "moderation",
+                "senders",
+                "block"
+              ]
+            }
+          }
+        },
+        {
+          "name": "POST /api/moderation/senders/unblock",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"sender\": \"usuario_troll\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/moderation/senders/unblock",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "moderation",
+                "senders",
+                "unblock"
+              ]
+            }
+          }
+        },
+        {
+          "name": "POST /api/moderation/keywords/block",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"keyword\": \"palavra_proibida\",\n  \"reason\": \"conteudo indevido\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/moderation/keywords/block",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "moderation",
+                "keywords",
+                "block"
+              ]
+            }
+          }
+        },
+        {
+          "name": "POST /api/moderation/keywords/unblock",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"keyword\": \"palavra_proibida\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/api/moderation/keywords/unblock",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "api",
+                "moderation",
+                "keywords",
+                "unblock"
+              ]
             }
           }
         }
@@ -146,8 +447,13 @@
             },
             "url": {
               "raw": "{{baseUrl}}/webhook/livepix?token={{webhookSecret}}",
-              "host": ["{{baseUrl}}"],
-              "path": ["webhook", "livepix"],
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "webhook",
+                "livepix"
+              ],
               "query": [
                 {
                   "key": "token",
@@ -187,8 +493,13 @@
             },
             "url": {
               "raw": "{{baseUrl}}/webhook/livepix",
-              "host": ["{{baseUrl}}"],
-              "path": ["webhook", "livepix"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "webhook",
+                "livepix"
+              ]
             },
             "description": "Simula um webhook com valor >= 10 e link: entra na fila."
           }
@@ -222,8 +533,13 @@
             },
             "url": {
               "raw": "{{baseUrl}}/webhook/livepix",
-              "host": ["{{baseUrl}}"],
-              "path": ["webhook", "livepix"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "webhook",
+                "livepix"
+              ]
             },
             "description": "Exemplo com amount em centavos (1000 => R$ 10,00) e tipper, parecido com os exemplos da API LivePix."
           }
@@ -257,8 +573,13 @@
             },
             "url": {
               "raw": "{{baseUrl}}/webhook/livepix",
-              "host": ["{{baseUrl}}"],
-              "path": ["webhook", "livepix"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "webhook",
+                "livepix"
+              ]
             },
             "description": "Alguns webhooks do LivePix podem vir apenas com type/id. Para este request funcionar, configure LIVEPIX_ACCESS_TOKEN ou LIVEPIX_CLIENT_ID/SECRET no .env."
           }
@@ -292,8 +613,13 @@
             },
             "url": {
               "raw": "{{baseUrl}}/webhook/livepix",
-              "host": ["{{baseUrl}}"],
-              "path": ["webhook", "livepix"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "webhook",
+                "livepix"
+              ]
             },
             "description": "Modelo \"Notificacao Leve\": o webhook envia apenas um gatilho + resource.id/resource.type. O servidor busca os detalhes na API do LivePix (requer LIVEPIX_ACCESS_TOKEN ou LIVEPIX_CLIENT_ID/SECRET no .env)."
           }
@@ -327,8 +653,13 @@
             },
             "url": {
               "raw": "{{baseUrl}}/webhook/livepix",
-              "host": ["{{baseUrl}}"],
-              "path": ["webhook", "livepix"]
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "webhook",
+                "livepix"
+              ]
             },
             "description": "Exemplo de Notificacao Leve para subscription."
           }

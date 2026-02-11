@@ -2,6 +2,20 @@
 
 Este projeto segue (aproximadamente) SemVer.
 
+## v1.3.0 (2026-02-11)
+
+- Auditoria local persistente (`ndjson`) com eventos de doação, ações e erros
+- Endpoints novos:
+  - `GET /api/audit`
+  - `GET /api/reports/summary`
+  - `GET /api/reports/top-senders`
+  - `GET /api/moderation`
+  - `POST /api/moderation/senders/block|unblock`
+  - `POST /api/moderation/keywords/block|unblock`
+- Moderação local por nome e palavra-chave com persistência em arquivo (`MODERATION_PATH`)
+- Dashboard com painel de resumo, últimos eventos e controles de moderação
+- Novas variáveis de ambiente para armazenamento local (`DATA_DIR`, `AUDIT_LOG_PATH`, `AUDIT_MAX_EVENTS`, `MODERATION_PATH`)
+
 ## v1.2.0 (2026-02-11)
 
 - Nova ação `webhook.request` para enviar POST JSON para webhook personalizado de acordo com a doação

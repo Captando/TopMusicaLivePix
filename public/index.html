@@ -156,6 +156,27 @@
         background: rgba(122, 230, 255, 0.12);
       }
 
+      button.mini {
+        padding: 6px 8px;
+        font-size: 11px;
+      }
+
+      input[type="text"] {
+        appearance: none;
+        border: 1px solid rgba(255, 255, 255, 0.14);
+        background: rgba(255, 255, 255, 0.08);
+        color: rgba(255, 255, 255, 0.92);
+        padding: 8px 10px;
+        border-radius: 10px;
+        font-family: var(--mono);
+        font-size: 12px;
+        width: min(100%, 260px);
+      }
+
+      input[type="text"]::placeholder {
+        color: rgba(255, 255, 255, 0.45);
+      }
+
       .muted {
         color: var(--muted);
         font-family: var(--mono);
@@ -299,6 +320,57 @@
         </aside>
       </div>
 
+      <div class="grid" style="margin-top: 12px">
+        <section class="card">
+          <h2>Auditoria e Relatorios (24h)</h2>
+          <div class="body">
+            <div class="row" style="margin-bottom: 10px">
+              <div class="pill">Doacoes: <strong id="sumDonations">0</strong></div>
+              <div class="pill">Total: <strong id="sumValue">R$ 0</strong></div>
+              <div class="pill">Ticket: <strong id="sumAvg">R$ 0</strong></div>
+              <div class="pill">Bloqueadas: <strong id="sumBlocked">0</strong></div>
+            </div>
+
+            <div class="muted" style="margin-bottom: 6px">Top doadores (24h)</div>
+            <div class="list" id="topSenders"></div>
+            <div class="muted" id="topSendersEmpty" style="margin-top: 10px">sem dados</div>
+
+            <div class="muted" style="margin: 12px 0 6px">Ultimos eventos</div>
+            <div class="list" id="auditEvents"></div>
+            <div class="muted" id="auditEmpty" style="margin-top: 10px">sem eventos</div>
+          </div>
+        </section>
+
+        <aside class="card">
+          <h2>Moderacao</h2>
+          <div class="body">
+            <div class="row" style="margin-bottom: 8px">
+              <input id="senderInput" type="text" placeholder="Nome do usuario" />
+              <button id="blockSenderBtn">bloquear nome</button>
+            </div>
+
+            <div class="row" style="margin-bottom: 12px">
+              <input id="keywordInput" type="text" placeholder="Palavra-chave" />
+              <button id="blockKeywordBtn">bloquear palavra</button>
+            </div>
+
+            <div class="muted" id="modStatus" style="margin-bottom: 8px">-</div>
+
+            <div class="muted" style="margin-bottom: 6px">Nomes bloqueados</div>
+            <div class="list" id="blockedSenders"></div>
+            <div class="muted" id="blockedSendersEmpty" style="margin-top: 10px">
+              nenhum nome bloqueado
+            </div>
+
+            <div class="muted" style="margin: 12px 0 6px">Palavras bloqueadas</div>
+            <div class="list" id="blockedKeywords"></div>
+            <div class="muted" id="blockedKeywordsEmpty" style="margin-top: 10px">
+              nenhuma palavra bloqueada
+            </div>
+          </div>
+        </aside>
+      </div>
+
       <footer>
         Apoiar o programador:
         <a href="https://livepix.gg/captando" target="_blank" rel="noreferrer">livepix.gg/captando</a>
@@ -330,6 +402,24 @@
       const queueEl = document.getElementById("queue");
       const queueEmpty = document.getElementById("queueEmpty");
       const lastWebhook = document.getElementById("lastWebhook");
+      const sumDonations = document.getElementById("sumDonations");
+      const sumValue = document.getElementById("sumValue");
+      const sumAvg = document.getElementById("sumAvg");
+      const sumBlocked = document.getElementById("sumBlocked");
+      const topSendersEl = document.getElementById("topSenders");
+      const topSendersEmpty = document.getElementById("topSendersEmpty");
+      const auditEvents = document.getElementById("auditEvents");
+      const auditEmpty = document.getElementById("auditEmpty");
+
+      const senderInput = document.getElementById("senderInput");
+      const keywordInput = document.getElementById("keywordInput");
+      const blockSenderBtn = document.getElementById("blockSenderBtn");
+      const blockKeywordBtn = document.getElementById("blockKeywordBtn");
+      const blockedSendersEl = document.getElementById("blockedSenders");
+      const blockedKeywordsEl = document.getElementById("blockedKeywords");
+      const blockedSendersEmpty = document.getElementById("blockedSendersEmpty");
+      const blockedKeywordsEmpty = document.getElementById("blockedKeywordsEmpty");
+      const modStatus = document.getElementById("modStatus");
 
       function formatBRL(v) {
         try {
@@ -359,6 +449,205 @@
         if (d < 60_000) return `${Math.floor(d / 1000)}s`;
         if (d < 3_600_000) return `${Math.floor(d / 60_000)}m`;
         return `${Math.floor(d / 3_600_000)}h`;
+      }
+
+      function formatDateTime(ts) {
+        const n = Number(ts);
+        if (!Number.isFinite(n) || n <= 0) return "-";
+        try {
+          return new Date(n).toLocaleString("pt-BR");
+        } catch {
+          return "-";
+        }
+      }
+
+      function setModStatus(text, isError = false) {
+        modStatus.textContent = text || "-";
+        modStatus.style.color = isError ? "var(--bad)" : "var(--muted)";
+      }
+
+      async function apiPost(url, payload) {
+        const resp = await fetch(url, {
+          method: "POST",
+          headers: { "content-type": "application/json" },
+          body: JSON.stringify(payload || {})
+        });
+        const json = await resp.json().catch(() => ({}));
+        if (!resp.ok || !json?.ok) {
+          const msg = json?.error || `HTTP ${resp.status}`;
+          throw new Error(msg);
+        }
+        return json;
+      }
+
+      function renderSummary(summary) {
+        const totals = summary?.totals || {};
+        sumDonations.textContent = String(totals.donations || 0);
+        sumValue.textContent = formatBRL(totals.value || 0);
+        sumAvg.textContent = formatBRL(totals.averageValue || 0);
+        sumBlocked.textContent = String(totals.blockedDonations || 0);
+      }
+
+      function renderTopSenders(items) {
+        const rows = Array.isArray(items) ? items : [];
+        topSendersEl.innerHTML = "";
+
+        for (const item of rows) {
+          const div = document.createElement("div");
+          div.className = "item";
+          div.innerHTML = `
+            <div class="topline">
+              <div class="who">${escapeHtml(item.sender || "-")}</div>
+              <div class="val">${formatBRL(item.totalValue || 0)}</div>
+            </div>
+            <div class="meta">
+              <span>doacoes: ${Number(item.donations) || 0}</span>
+              <span>ultima: ${formatDateTime(item.lastAt)}</span>
+            </div>
+          `;
+          topSendersEl.appendChild(div);
+        }
+
+        topSendersEmpty.style.display = rows.length ? "none" : "block";
+      }
+
+      function eventDetails(e) {
+        const t = String(e?.type || "");
+        if (t === "donation.accepted") {
+          return `${escapeHtml(e.sender || "-")} • ${formatBRL(e.value || 0)}${e.isNewTop ? " • novo top" : ""}`;
+        }
+        if (t === "donation.blocked") {
+          return `${escapeHtml(e.sender || "-")} • ${escapeHtml(e.reason || "-")} (${escapeHtml(e.blockMatch || "-")})`;
+        }
+        if (t === "action.executed") {
+          const status = e.skipped ? "skipped" : e.ok ? "ok" : "fail";
+          return `${escapeHtml(e.actionType || "-")} • ${status}${e.reason ? " • " + escapeHtml(e.reason) : ""}`;
+        }
+        if (t.startsWith("moderation.")) {
+          return `${escapeHtml(e.sender || e.keyword || "-")}${e.reason ? " • " + escapeHtml(e.reason) : ""}`;
+        }
+        return escapeHtml(e.reason || e.message || "-");
+      }
+
+      function renderAuditEvents(events) {
+        const rows = Array.isArray(events) ? events : [];
+        auditEvents.innerHTML = "";
+
+        for (const e of rows) {
+          const div = document.createElement("div");
+          div.className = "item";
+          div.innerHTML = `
+            <div class="topline">
+              <div class="who">${escapeHtml(e.type || "-")}</div>
+              <div class="val">${relTime(e.at)} atrás</div>
+            </div>
+            <div class="msg">${eventDetails(e)}</div>
+            <div class="meta">
+              <span>${formatDateTime(e.at)}</span>
+              ${e.donationId ? `<span>donationId: ${escapeHtml(e.donationId)}</span>` : ""}
+            </div>
+          `;
+          auditEvents.appendChild(div);
+        }
+
+        auditEmpty.style.display = rows.length ? "none" : "block";
+      }
+
+      function renderModerationList({ rows, container, emptyLabel, onUnblock, field }) {
+        container.innerHTML = "";
+        const list = Array.isArray(rows) ? rows : [];
+
+        for (const item of list) {
+          const div = document.createElement("div");
+          div.className = "item";
+
+          const btn = document.createElement("button");
+          btn.className = "mini";
+          btn.textContent = "desbloquear";
+          btn.addEventListener("click", async () => {
+            try {
+              await onUnblock(item.label || item.value || "");
+              setModStatus("item desbloqueado");
+            } catch (e) {
+              setModStatus(`erro: ${String(e?.message || e)}`, true);
+            }
+          });
+
+          const top = document.createElement("div");
+          top.className = "topline";
+          top.innerHTML = `
+            <div class="who">${escapeHtml(item.label || item.value || "-")}</div>
+            <div class="val">${formatDateTime(item.at)}</div>
+          `;
+          top.appendChild(btn);
+
+          const meta = document.createElement("div");
+          meta.className = "meta";
+          meta.innerHTML = `
+            <span>${field}: ${escapeHtml(item.value || "-")}</span>
+            ${item.reason ? `<span>motivo: ${escapeHtml(item.reason)}</span>` : ""}
+          `;
+
+          div.appendChild(top);
+          div.appendChild(meta);
+          container.appendChild(div);
+        }
+
+        emptyLabel.style.display = list.length ? "none" : "block";
+      }
+
+      async function loadAuditAndReports() {
+        try {
+          const [summaryResp, topResp, auditResp] = await Promise.all([
+            fetch("/api/reports/summary?hours=24", { cache: "no-store" }),
+            fetch("/api/reports/top-senders?hours=24&limit=8", { cache: "no-store" }),
+            fetch("/api/audit?hours=24&limit=20", { cache: "no-store" })
+          ]);
+
+          const summary = await summaryResp.json();
+          const top = await topResp.json();
+          const audit = await auditResp.json();
+
+          if (summary?.ok) renderSummary(summary);
+          if (top?.ok) renderTopSenders(top.senders);
+          if (audit?.ok) renderAuditEvents(audit.events);
+        } catch {
+          // Keep dashboard running even if report endpoints fail temporarily.
+        }
+      }
+
+      async function loadModeration() {
+        try {
+          const resp = await fetch("/api/moderation", { cache: "no-store" });
+          const json = await resp.json();
+          if (!json?.ok) return;
+
+          const data = json.data || {};
+          renderModerationList({
+            rows: data.blockedSenders || [],
+            container: blockedSendersEl,
+            emptyLabel: blockedSendersEmpty,
+            field: "sender",
+            onUnblock: async (sender) => {
+              await apiPost("/api/moderation/senders/unblock", { sender });
+              await loadModeration();
+              await loadAuditAndReports();
+            }
+          });
+          renderModerationList({
+            rows: data.blockedKeywords || [],
+            container: blockedKeywordsEl,
+            emptyLabel: blockedKeywordsEmpty,
+            field: "keyword",
+            onUnblock: async (keyword) => {
+              await apiPost("/api/moderation/keywords/unblock", { keyword });
+              await loadModeration();
+              await loadAuditAndReports();
+            }
+          });
+        } catch {
+          // Silent; connection can recover automatically.
+        }
       }
 
       function setState(state) {
@@ -464,6 +753,43 @@
         await fetch("/api/rules/reload", { method: "POST" });
       });
 
+      blockSenderBtn.addEventListener("click", async () => {
+        const sender = String(senderInput.value || "").trim();
+        if (!sender) {
+          setModStatus("informe um nome para bloquear", true);
+          return;
+        }
+        try {
+          await apiPost("/api/moderation/senders/block", { sender, reason: "manual_dashboard" });
+          senderInput.value = "";
+          setModStatus("nome bloqueado");
+          await loadModeration();
+          await loadAuditAndReports();
+        } catch (e) {
+          setModStatus(`erro: ${String(e?.message || e)}`, true);
+        }
+      });
+
+      blockKeywordBtn.addEventListener("click", async () => {
+        const keyword = String(keywordInput.value || "").trim();
+        if (!keyword) {
+          setModStatus("informe uma palavra para bloquear", true);
+          return;
+        }
+        try {
+          await apiPost("/api/moderation/keywords/block", {
+            keyword,
+            reason: "manual_dashboard"
+          });
+          keywordInput.value = "";
+          setModStatus("palavra bloqueada");
+          await loadModeration();
+          await loadAuditAndReports();
+        } catch (e) {
+          setModStatus(`erro: ${String(e?.message || e)}`, true);
+        }
+      });
+
       async function loadVersion() {
         try {
           const resp = await fetch("/api/version", { cache: "no-store" });
@@ -517,6 +843,10 @@
 
       loadVersion();
       setInterval(loadVersion, 60_000);
+      loadAuditAndReports();
+      loadModeration();
+      setInterval(loadAuditAndReports, 15_000);
+      setInterval(loadModeration, 15_000);
     </script>
   </body>
 </html>

@@ -65,6 +65,18 @@ function loadRules(rulesPath) {
 
 function getConfig() {
   const rulesPath = env("RULES_PATH", "config/rules.json");
+  const dataDirRaw = env("DATA_DIR", "data");
+  const dataDir = path.isAbsolute(dataDirRaw)
+    ? dataDirRaw
+    : path.join(process.cwd(), dataDirRaw);
+  const auditLogPathRaw = env("AUDIT_LOG_PATH", path.join(dataDir, "audit-log.ndjson"));
+  const moderationPathRaw = env("MODERATION_PATH", path.join(dataDir, "moderation.json"));
+  const auditLogPath = path.isAbsolute(auditLogPathRaw)
+    ? auditLogPathRaw
+    : path.join(process.cwd(), auditLogPathRaw);
+  const moderationPath = path.isAbsolute(moderationPathRaw)
+    ? moderationPathRaw
+    : path.join(process.cwd(), moderationPathRaw);
 
   return {
     host: env("HOST", "127.0.0.1"),
@@ -115,6 +127,13 @@ function getConfig() {
       enabled: envBool("OBS_WS_ENABLED", false),
       url: env("OBS_WS_URL", "ws://127.0.0.1:4455"),
       password: env("OBS_WS_PASSWORD", "")
+    },
+
+    storage: {
+      dataDir,
+      auditLogPath,
+      moderationPath,
+      auditMaxEvents: envInt("AUDIT_MAX_EVENTS", 5000)
     },
 
     rulesPath,

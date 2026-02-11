@@ -10,6 +10,9 @@ Automação local para streamers: receba doações do **LivePix** via webhook e 
   - Música: fila e VIP (toca imediatamente) no player do YouTube
   - Minecraft: comandos via RCON
   - SFX: toca arquivos de áudio no overlay do OBS (opcional)
+- Mantém auditoria local (log persistente de doações, ações e bloqueios)
+- Oferece moderação local (bloqueio por nome e palavra-chave)
+- Gera relatórios (resumo por janela de tempo e top doadores)
 - Mostra um dashboard local para acompanhar tudo
 
 ## Páginas
@@ -126,6 +129,10 @@ node -e "console.log(require('crypto').randomBytes(24).toString('hex'))"
 - `WEBHOOK_RATE_LIMIT_WINDOW_MS` e `WEBHOOK_RATE_LIMIT_MAX`: limitador simples de requisições no webhook
 - `OUT_WEBHOOK_ALLOW_HOSTS`: hosts permitidos para ações `webhook.request` (padrão seguro: `127.0.0.1,localhost`)
 - `OUT_WEBHOOK_TIMEOUT_MS`: timeout das chamadas de webhook de saída
+- `DATA_DIR`: pasta base de dados locais (auditoria/moderação)
+- `AUDIT_LOG_PATH`: arquivo de auditoria (ndjson)
+- `AUDIT_MAX_EVENTS`: quantidade máxima mantida em memória para consulta rápida
+- `MODERATION_PATH`: arquivo de moderação (bloqueios)
 
 LivePix (mapeamento do JSON do webhook, se necessário):
 
@@ -379,6 +386,73 @@ Ou via API:
 ```bash
 curl -X POST http://127.0.0.1:3000/api/rules/reload
 ```
+
+## Auditoria, Relatórios e Moderação
+
+### Auditoria (persistente local)
+
+- Endpoint: `GET /api/audit`
+- Filtros:
+  - `limit` (1-1000)
+  - `hours` (opcional)
+  - `type` (ex: `donation.accepted`, `action.executed`, `donation.blocked`)
+  - `sender`
+  - `donationId`
+  - `actionType`
+
+Exemplo:
+
+```bash
+curl "http://127.0.0.1:3000/api/audit?hours=24&limit=50"
+```
+
+### Relatórios
+
+- `GET /api/reports/summary?hours=24`
+  - total de doações
+  - valor total e ticket médio
+  - quantidade de doadores únicos
+  - doações bloqueadas/duplicadas
+  - sucesso/falha por tipo de ação
+- `GET /api/reports/top-senders?hours=24&limit=10`
+  - ranking de doadores por valor no período
+
+Exemplo:
+
+```bash
+curl "http://127.0.0.1:3000/api/reports/summary?hours=24"
+curl "http://127.0.0.1:3000/api/reports/top-senders?hours=24&limit=10"
+```
+
+### Moderação local
+
+Consulta:
+
+- `GET /api/moderation`
+
+Bloqueio/desbloqueio de nome:
+
+- `POST /api/moderation/senders/block`
+- `POST /api/moderation/senders/unblock`
+
+Bloqueio/desbloqueio de palavra-chave:
+
+- `POST /api/moderation/keywords/block`
+- `POST /api/moderation/keywords/unblock`
+
+Exemplo:
+
+```bash
+curl -X POST "http://127.0.0.1:3000/api/moderation/senders/block" \
+  -H "content-type: application/json" \
+  -d '{"sender":"usuario_troll","reason":"spam"}'
+
+curl -X POST "http://127.0.0.1:3000/api/moderation/keywords/block" \
+  -H "content-type: application/json" \
+  -d '{"keyword":"palavra_proibida","reason":"conteudo indevido"}'
+```
+
+Quando um nome/palavra estiver bloqueado, a doação é ignorada antes de executar regras/ações e isso aparece na auditoria como `donation.blocked`.
 
 ## Teste rápido (sem LivePix)
 
