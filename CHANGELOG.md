@@ -2,6 +2,10 @@
 
 Este projeto segue (aproximadamente) SemVer.
 
+## v1.0.1 (2026-02-11)
+
+- Dashboard agora compara versão pelo `package.json` remoto (evita falso "update disponível" por commit de merge)
+
 ## v1.0.0 (2026-02-11)
 
 Primeira release estável.
@@ -13,4 +17,3 @@ Primeira release estável.
 - Minecraft via RCON (`minecraft.rcon` / `minecraft.rconMulti`)
 - Scripts Windows: instalar (`scripts/install-windows.*`) e atualizar (`scripts/update-windows.*`)
 - Coleção Postman da API local em `docs/topmusicalivepix-local.postman_collection.json`
-

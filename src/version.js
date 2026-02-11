@@ -89,6 +89,26 @@ async function fetchGithubLatestCommit({ owner, repo, branch }) {
   };
 }
 
+async function fetchGithubPackageJsonVersion({ owner, repo, ref }) {
+  const url = `https://raw.githubusercontent.com/${encodeURIComponent(owner)}/${encodeURIComponent(repo)}/${encodeURIComponent(ref)}/package.json`;
+
+  const resp = await fetch(url, {
+    headers: {
+      accept: "application/json",
+      "user-agent": "TopMusicaLivePix"
+    }
+  });
+
+  if (!resp.ok) {
+    const txt = await resp.text().catch(() => "");
+    throw new Error(`GitHub raw package.json failed: HTTP ${resp.status} ${txt}`.trim());
+  }
+
+  const json = await resp.json();
+  const v = json?.version ? String(json.version) : "";
+  return v.trim();
+}
+
 function createVersionService({
   owner,
   repo,
@@ -109,7 +129,11 @@ function createVersionService({
     }
 
     try {
-      const data = await fetchGithubLatestCommit({ owner, repo, branch });
+      const [commitInfo, remotePkgVersion] = await Promise.all([
+        fetchGithubLatestCommit({ owner, repo, branch }),
+        fetchGithubPackageJsonVersion({ owner, repo, ref: branch })
+      ]);
+      const data = { ...commitInfo, packageVersion: remotePkgVersion };
       state.remote = data;
       state.remoteCheckedAt = now;
       state.remoteError = null;
@@ -135,7 +159,9 @@ function createVersionService({
     const remoteRes = await getRemote();
 
     let upToDate = null;
-    if (local.available && remoteRes.ok && local.commit && remoteRes.data.commit) {
+    if (remoteRes.ok && pkgVersion && remoteRes.data.packageVersion) {
+      upToDate = String(pkgVersion) === String(remoteRes.data.packageVersion);
+    } else if (local.available && remoteRes.ok && local.commit && remoteRes.data.commit) {
       upToDate = local.commit === remoteRes.data.commit;
     }
 

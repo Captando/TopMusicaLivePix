@@ -480,6 +480,7 @@
           const remoteSubj = remoteOk ? v.remote?.subject || "" : "";
           const remoteAuthor = remoteOk ? v.remote?.author || "" : "";
           const remoteDate = remoteOk ? v.remote?.date || "" : "";
+          const remotePkgVersion = remoteOk ? v.remote?.packageVersion || "" : "";
 
           let remoteWhen = "";
           if (remoteDate) {
@@ -494,7 +495,8 @@
           else if (v.upToDate === false) status = "atualização disponível";
 
           const parts = [];
-          if (v.local?.packageVersion) parts.push(`v${v.local.packageVersion}`);
+          if (v.local?.packageVersion) parts.push(`local v${v.local.packageVersion}`);
+          if (remotePkgVersion) parts.push(`última v${remotePkgVersion}`);
           if (localSha) parts.push(`local ${localSha}`);
           else parts.push("local sem git");
           if (remoteSha) parts.push(`remoto ${remoteSha}`);
