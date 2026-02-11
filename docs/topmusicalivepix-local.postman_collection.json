@@ -1,0 +1,253 @@
+{
+  "info": {
+    "_postman_id": "f2f18c2b-4e8f-4d8e-9b68-8a2b1b7d3d0d",
+    "name": "TopMusicaLivePix (API Local)",
+    "description": "Colecao Postman para testar a API local do TopMusicaLivePix.\n\nVariaveis sugeridas (Environment):\n- baseUrl: http://127.0.0.1:3000\n- webhookSecret: (o mesmo do .env -> WEBHOOK_SECRET)\n- livepixMessageId: (opcional, se voce for testar webhook resumido)\n- livepixSubscriptionId: (opcional)\n\nDica: para seguranca, use o webhook com ?token={{webhookSecret}} ou header x-webhook-secret.",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+  },
+  "item": [
+    {
+      "name": "Health / State",
+      "item": [
+        {
+          "name": "GET /health",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/health",
+              "host": ["{{baseUrl}}"],
+              "path": ["health"]
+            }
+          }
+        },
+        {
+          "name": "GET /api/state",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/state",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "state"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Music / Rules",
+      "item": [
+        {
+          "name": "POST /api/music/skip",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/music/skip",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "music", "skip"]
+            }
+          }
+        },
+        {
+          "name": "POST /api/music/clear",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/music/clear",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "music", "clear"]
+            }
+          }
+        },
+        {
+          "name": "POST /api/rules/reload",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/api/rules/reload",
+              "host": ["{{baseUrl}}"],
+              "path": ["api", "rules", "reload"]
+            }
+          }
+        }
+      ]
+    },
+    {
+      "name": "Webhook (LivePix)",
+      "item": [
+        {
+          "name": "POST /webhook/livepix (token query) - VIP + Creeper",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"value\": 25,\n  \"message\": \"https://youtu.be/dQw4w9WgXcQ creeper\",\n  \"sender\": \"Alice\",\n  \"status\": \"paid\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/webhook/livepix?token={{webhookSecret}}",
+              "host": ["{{baseUrl}}"],
+              "path": ["webhook", "livepix"],
+              "query": [
+                {
+                  "key": "token",
+                  "value": "{{webhookSecret}}"
+                }
+              ]
+            },
+            "description": "Simula um webhook do LivePix com valor em REAIS. Regras default: VIP >= 20 com link e creeper >= 5."
+          }
+        },
+        {
+          "name": "POST /webhook/livepix (header) - Fila",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "x-webhook-secret",
+                "value": "{{webhookSecret}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"value\": 10,\n  \"message\": \"https://youtu.be/dQw4w9WgXcQ\",\n  \"sender\": \"Bob\",\n  \"status\": \"paid\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/webhook/livepix",
+              "host": ["{{baseUrl}}"],
+              "path": ["webhook", "livepix"]
+            },
+            "description": "Simula um webhook com valor >= 10 e link: entra na fila."
+          }
+        },
+        {
+          "name": "POST /webhook/livepix - amount (centavos) + tipper (estilo API LivePix)",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "x-webhook-secret",
+                "value": "{{webhookSecret}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"amount\": 1000,\n  \"message\": \"https://youtu.be/dQw4w9WgXcQ\",\n  \"tipper\": \"Carol\",\n  \"status\": \"paid\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/webhook/livepix",
+              "host": ["{{baseUrl}}"],
+              "path": ["webhook", "livepix"]
+            },
+            "description": "Exemplo com amount em centavos (1000 => R$ 10,00) e tipper, parecido com os exemplos da API LivePix."
+          }
+        },
+        {
+          "name": "POST /webhook/livepix - resumido (type/id) [requer LivePix API no .env]",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "x-webhook-secret",
+                "value": "{{webhookSecret}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"type\": \"message\",\n  \"messageId\": \"{{livepixMessageId}}\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/webhook/livepix",
+              "host": ["{{baseUrl}}"],
+              "path": ["webhook", "livepix"]
+            },
+            "description": "Alguns webhooks do LivePix podem vir apenas com type/id. Para este request funcionar, configure LIVEPIX_ACCESS_TOKEN ou LIVEPIX_CLIENT_ID/SECRET no .env."
+          }
+        }
+      ]
+    }
+  ]
+}
+

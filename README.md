@@ -222,6 +222,8 @@ Onde pegar:
 
 Referência extra (opcional): `docs/livepix-api.postman_collection.json`.
 
+Coleção Postman da API local: `docs/topmusicalivepix-local.postman_collection.json`.
+
 ## Minecraft (RCON)
 
 RCON exige servidor dedicado (vanilla/paper/etc).
