@@ -123,7 +123,7 @@ LivePix (mapeamento do JSON do webhook, se necessário):
 - `LIVEPIX_STATUS_PATH`: caminho do status. Ex: `data.status`
 - `LIVEPIX_ACCEPTED_STATUSES`: lista de status aceitos (se `STATUS_PATH` estiver configurado)
 
-LivePix API (só se o webhook vier resumido com `type/id`):
+LivePix API (só se o webhook vier em modo “Notificação Leve”, sem valor/mensagem):
 
 - `LIVEPIX_ACCESS_TOKEN`: token (expira)
 - `LIVEPIX_CLIENT_ID` e `LIVEPIX_CLIENT_SECRET`: credenciais (recomendado)
@@ -215,9 +215,22 @@ No painel do LivePix:
 2. Use o endpoint `/webhook/livepix`
 3. Inclua o `token` com seu `WEBHOOK_SECRET`
 
-### Se o webhook do LivePix vier “resumido” (type/id)
+### Se o webhook do LivePix vier em modo “Notificação Leve” (sem valor/mensagem)
 
-O LivePix pode enviar no webhook somente o `type/id` do evento, exigindo buscar os detalhes na API.
+O LivePix pode enviar no webhook apenas um gatilho com **ID do recurso**, sem trazer `valor/mensagem/nome` no payload.
+
+Exemplo comum (variantes existem):
+
+```json
+{
+  "eventId": "evt_123",
+  "event": "new",
+  "resource": { "id": "64f8a...e12", "type": "message" },
+  "userId": "61021c..."
+}
+```
+
+Nessa forma, o servidor precisa pegar `resource.id` e consultar a API do LivePix para obter os dados reais.
 
 Você tem 2 opções no `.env`:
 

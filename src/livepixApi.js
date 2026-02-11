@@ -86,11 +86,41 @@ class LivePixApi {
     return resp.json();
   }
 
+  async _apiFetchJsonMaybe(urlPath) {
+    try {
+      return await this._apiFetchJson(urlPath);
+    } catch (e) {
+      const msg = String(e?.message || "");
+      if (msg.includes("HTTP 404")) return null;
+      throw e;
+    }
+  }
+
   async fetchMessage(messageId) {
     const id = String(messageId || "").trim();
     if (!id) throw new Error("Missing messageId");
     const json = await this._apiFetchJson(`/v1/messages/${encodeURIComponent(id)}`);
     return json?.data || null;
+  }
+
+  async fetchPayment(paymentId) {
+    const id = String(paymentId || "").trim();
+    if (!id) throw new Error("Missing paymentId");
+
+    // Some LivePix setups refer to "payment" resources; endpoints can vary by API version.
+    // Try common candidates and return the first that exists.
+    const candidates = [
+      `/v2/payments/${encodeURIComponent(id)}`,
+      `/v1/payments/${encodeURIComponent(id)}`,
+      `/v1/messages/${encodeURIComponent(id)}`
+    ];
+
+    for (const p of candidates) {
+      const json = await this._apiFetchJsonMaybe(p);
+      if (json && json.data) return json.data;
+    }
+
+    return null;
   }
 
   async fetchSubscription(subscriptionId) {
@@ -102,4 +132,3 @@ class LivePixApi {
 }
 
 module.exports = { LivePixApi };
-

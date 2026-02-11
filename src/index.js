@@ -246,16 +246,29 @@ async function main() {
     }
 
     try {
-      if (ref.type.includes("message")) {
-        const msg = await livepixApi.fetchMessage(ref.id);
+      const safe = (s) => String(s || "").replace(/[^a-z0-9_-]+/gi, "_");
+      const baseId = `lp_${safe(ref.type)}_${safe(ref.id)}`;
+
+      if (ref.type.includes("message") || ref.type.includes("payment")) {
+        const msg = ref.type.includes("payment")
+          ? (await livepixApi.fetchPayment(ref.id)) || (await livepixApi.fetchMessage(ref.id))
+          : await livepixApi.fetchMessage(ref.id);
         if (!msg) throw new Error("message_not_found");
 
+        const amountRaw = msg.amount ?? msg.value ?? msg.valor;
+        const amountNum = Number(amountRaw);
+        const value = Number.isFinite(amountNum)
+          ? Number.isInteger(amountNum)
+            ? amountNum / 100
+            : amountNum
+          : 0;
+
         const donation = {
-          id: `lp_msg_${ref.id}`,
+          id: baseId,
           at: Date.now(),
-          value: (Number(msg.amount) || 0) / 100,
-          message: String(msg.message || "").trim(),
-          sender: String(msg.tipper || "Anon").trim(),
+          value,
+          message: String(msg.message || msg.text || msg.comment || "").trim(),
+          sender: String(msg.username || msg.tipper || msg.name || "Anon").trim(),
           status: "paid"
         };
         await processDonation({ donation, raw: body });
@@ -266,12 +279,20 @@ async function main() {
         const sub = await livepixApi.fetchSubscription(ref.id);
         if (!sub) throw new Error("subscription_not_found");
 
+        const amountRaw = sub.amount ?? sub.value ?? sub.valor;
+        const amountNum = Number(amountRaw);
+        const value = Number.isFinite(amountNum)
+          ? Number.isInteger(amountNum)
+            ? amountNum / 100
+            : amountNum
+          : 0;
+
         const donation = {
-          id: `lp_sub_${ref.id}`,
+          id: baseId,
           at: Date.now(),
-          value: (Number(sub.amount) || 0) / 100,
+          value,
           message: `subscription (${Number(sub.months) || 1}m)`,
-          sender: String(sub.subscriber || "Anon").trim(),
+          sender: String(sub.username || sub.subscriber || sub.name || "Anon").trim(),
           status: "paid"
         };
         await processDonation({ donation, raw: body });

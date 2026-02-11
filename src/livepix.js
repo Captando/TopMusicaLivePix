@@ -141,20 +141,39 @@ function extractDonation(body, livepixConfig) {
 }
 
 function extractWebhookRef(body) {
+  // Lightweight notification model: { resource: { id, type, reference? }, eventId, event, userId }
+  const resource = firstDefined(body?.resource, body?.data?.resource);
+  const resourceTypeRaw = resource?.type;
+  const resourceIdRaw = resource?.id;
+
+  if (resourceTypeRaw && resourceIdRaw) {
+    const type = String(resourceTypeRaw).toLowerCase().trim();
+    const id = String(resourceIdRaw).trim();
+    if (type && id) return { type, id };
+  }
+
+  const allowedEventTypes = new Set(["message", "payment", "subscription"]);
+  const eventAsType =
+    body?.event && allowedEventTypes.has(String(body.event).toLowerCase().trim())
+      ? body.event
+      : undefined;
+
   const typeRaw = firstDefined(
     body.type,
-    body.event,
     body.kind,
     body?.data?.type,
-    body?.data?.event
+    body?.data?.kind,
+    eventAsType
   );
 
   const idRaw = firstDefined(
     body.messageId,
     body.subscriptionId,
+    body.paymentId,
     body.id,
     body?.data?.messageId,
     body?.data?.subscriptionId,
+    body?.data?.paymentId,
     body?.data?.id
   );
 
@@ -165,6 +184,7 @@ function extractWebhookRef(body) {
     // Infer type from common fields.
     if (body.messageId || body?.data?.messageId) type = "message";
     else if (body.subscriptionId || body?.data?.subscriptionId) type = "subscription";
+    else if (body.paymentId || body?.data?.paymentId) type = "payment";
   }
 
   if (!type || !id) return null;
@@ -173,15 +193,23 @@ function extractWebhookRef(body) {
 
 function extractExternalId(body) {
   const idRaw = firstDefined(
+    body?.resource?.reference,
+    body?.data?.resource?.reference,
+    body?.resource?.id,
+    body?.data?.resource?.id,
     body.messageId,
     body.subscriptionId,
+    body.paymentId,
     body.pixId,
     body.reference,
+    body.eventId,
     body.id,
     body?.data?.messageId,
     body?.data?.subscriptionId,
+    body?.data?.paymentId,
     body?.data?.pixId,
     body?.data?.reference,
+    body?.data?.eventId,
     body?.data?.id
   );
   if (!idRaw) return null;

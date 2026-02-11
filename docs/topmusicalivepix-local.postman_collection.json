@@ -2,7 +2,7 @@
   "info": {
     "_postman_id": "f2f18c2b-4e8f-4d8e-9b68-8a2b1b7d3d0d",
     "name": "TopMusicaLivePix (API Local)",
-    "description": "Colecao Postman para testar a API local do TopMusicaLivePix.\n\nVariaveis sugeridas (Environment):\n- baseUrl: http://127.0.0.1:3000\n- webhookSecret: (o mesmo do .env -> WEBHOOK_SECRET)\n- livepixMessageId: (opcional, se voce for testar webhook resumido)\n- livepixSubscriptionId: (opcional)\n\nDica: para seguranca, use o webhook com ?token={{webhookSecret}} ou header x-webhook-secret.",
+    "description": "Colecao Postman para testar a API local do TopMusicaLivePix.\n\nVariaveis sugeridas (Environment):\n- baseUrl: http://127.0.0.1:3000\n- webhookSecret: (o mesmo do .env -> WEBHOOK_SECRET)\n- livepixMessageId: (opcional, para testar webhook resumido / notificacao leve)\n- livepixSubscriptionId: (opcional)\n\nDica: para seguranca, use o webhook com ?token={{webhookSecret}} ou header x-webhook-secret.\n\nImportante: alguns webhooks do LivePix funcionam como \"Notificacao Leve\" e enviam apenas resource.id/resource.type. Nesse caso, configure LIVEPIX_ACCESS_TOKEN ou LIVEPIX_CLIENT_ID/SECRET no .env para que o servidor busque os dados na API.",
     "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
   },
   "item": [
@@ -212,7 +212,7 @@
           }
         },
         {
-          "name": "POST /webhook/livepix - resumido (type/id) [requer LivePix API no .env]",
+          "name": "POST /webhook/livepix - resumido (type/messageId) [requer LivePix API no .env]",
           "request": {
             "method": "POST",
             "header": [
@@ -245,9 +245,78 @@
             },
             "description": "Alguns webhooks do LivePix podem vir apenas com type/id. Para este request funcionar, configure LIVEPIX_ACCESS_TOKEN ou LIVEPIX_CLIENT_ID/SECRET no .env."
           }
+        },
+        {
+          "name": "POST /webhook/livepix - notificacao leve (resource.id/type) message [requer LivePix API no .env]",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "x-webhook-secret",
+                "value": "{{webhookSecret}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"eventId\": \"evt_123456789\",\n  \"event\": \"new\",\n  \"resource\": {\n    \"id\": \"{{livepixMessageId}}\",\n    \"type\": \"message\"\n  },\n  \"userId\": \"61021c...\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/webhook/livepix",
+              "host": ["{{baseUrl}}"],
+              "path": ["webhook", "livepix"]
+            },
+            "description": "Modelo \"Notificacao Leve\": o webhook envia apenas um gatilho + resource.id/resource.type. O servidor busca os detalhes na API do LivePix (requer LIVEPIX_ACCESS_TOKEN ou LIVEPIX_CLIENT_ID/SECRET no .env)."
+          }
+        },
+        {
+          "name": "POST /webhook/livepix - notificacao leve (resource.id/type) subscription [requer LivePix API no .env]",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              },
+              {
+                "key": "Accept",
+                "value": "application/json"
+              },
+              {
+                "key": "x-webhook-secret",
+                "value": "{{webhookSecret}}"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"eventId\": \"evt_987654321\",\n  \"event\": \"new\",\n  \"resource\": {\n    \"id\": \"{{livepixSubscriptionId}}\",\n    \"type\": \"subscription\"\n  },\n  \"userId\": \"61021c...\"\n}",
+              "options": {
+                "raw": {
+                  "language": "json"
+                }
+              }
+            },
+            "url": {
+              "raw": "{{baseUrl}}/webhook/livepix",
+              "host": ["{{baseUrl}}"],
+              "path": ["webhook", "livepix"]
+            },
+            "description": "Exemplo de Notificacao Leve para subscription."
+          }
         }
       ]
     }
   ]
 }
-
