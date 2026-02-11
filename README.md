@@ -302,3 +302,9 @@ curl -X POST http://127.0.0.1:3000/api/rules/reload
 ## Licença
 
 MIT (veja `LICENSE`).
+
+## Apoiar o Programador
+
+Se esse projeto te ajudou e você quiser apoiar o desenvolvimento:
+
+`https://livepix.gg/captando`

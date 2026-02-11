@@ -214,6 +214,24 @@
       .k {
         color: rgba(255, 255, 255, 0.72);
       }
+
+      footer {
+        margin-top: 14px;
+        text-align: center;
+        font-family: var(--mono);
+        font-size: 12px;
+        color: rgba(255, 255, 255, 0.6);
+      }
+
+      footer a {
+        color: rgba(122, 230, 255, 0.92);
+        text-decoration: none;
+        border-bottom: 1px solid rgba(122, 230, 255, 0.35);
+      }
+
+      footer a:hover {
+        border-bottom-color: rgba(122, 230, 255, 0.75);
+      }
     </style>
   </head>
   <body>
@@ -278,6 +296,11 @@
           </div>
         </aside>
       </div>
+
+      <footer>
+        Apoiar o programador:
+        <a href="https://livepix.gg/captando" target="_blank" rel="noreferrer">livepix.gg/captando</a>
+      </footer>
     </div>
 
     <script src="/socket.io/socket.io.js"></script>
