@@ -49,6 +49,16 @@ Links oficiais:
 
 ## Instalação (passo a passo)
 
+### Instalador Windows (mais facil)
+
+Dentro do repositorio, rode:
+
+- `scripts\\install-windows.bat` (duplo clique)
+ou
+- `powershell -NoProfile -ExecutionPolicy Bypass -File .\\scripts\\install-windows.ps1`
+
+O script tenta instalar `Git`, `Node.js LTS` e `ngrok` via `winget`, instala dependencias e cria o `.env` com `WEBHOOK_SECRET` gerado.
+
 ### 1) Instalar o Node.js (LTS)
 
 Windows/macOS:
