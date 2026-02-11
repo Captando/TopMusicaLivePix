@@ -1,0 +1,2626 @@
+{
+  "info": {
+    "_postman_id": "c30738e4-3b7a-49ad-b476-9f81ab87afc8",
+    "name": "LivePix API Documentation",
+    "description": "\n# Intro\n\nA API LivePix foi construida utilizando tecnologias atuais, provendo segurança e padronização.\n\n## Rate Limit\n\nPara garantir o uso justo da API, cada endpoint é protegido por um limite de requisições que reseta a cada minuto. Se você ultrapassar o limite máximo de chamadas no mesmo minuto para um mesmo endpoint, a API passará a retornar `HTTP 429 Too Many Requests` até que o limite seja resetado no próximo minuto.\n\nPara saber qual o limite de cada endpoint, verifique o valor do header `X-RateLimit-Limit` na resposta do endpoint.\n\n# OAuth2\n\nA API LivePix utiliza OAuth2 para gerenciar as permissões de acesso a API. Você pode se autenticar utilizando suas credenciais de cliente ou como um usuário terceiro através do fluxo de autorização.\n\nCrie uma aplicação nas configurações da sua conta para obter o `client_id` e `client_secret` necessários para os passos abaixo.\n\n## Credenciais do cliente\n\nPara autenticar na sua própria conta, você pode utilizar o grant `client_credentials`:\n\n```\nPOST https://oauth.livepix.gg/oauth2/token\ngrant_type=client_credentials&client_id=<id do cliente>&client_secret=<segredo do cliente>&scope=<permissoes>\n```\n\nA requisição acima deve retornar o token de acesso para a conta conforme o exemplo abaixo:\n\n```\n{\n  \"access_token\": \"...\",\n  \"expires_in\": 3600,\n  \"scope\": \"account:read wallet:read webhooks\",\n  \"token_type\": \"bearer\"\n}\n```\n\n## Código de autorização\n\nPara solicitar permissão para acessar uma conta de terceiro, siga o fluxo de autorização abaixo:\n\n- Redirecione o usuário para a URL abaixo (substitua os parâmetros pelos configurados na sua aplicação):\n\n```\nhttps://oauth.livepix.gg/oauth2/auth?client_id=<id do cliente>&redirect_uri=<url de redirecionamento>&response_type=code&scope=<permissoes>&state=<state>\n```\n\nO usuário será direcionado para uma página onde revisará as permissões solicitadas e poderá aprovar ou não a conexão.\n\n- Após o usuário aprovar, o usuário será redirecionado para a URL configurada no parâmetro `redirect_uri` com um parâmetro `code` na URL que será utilizado no passo a seguir. \n\n- Utilize a requisição abaixo para trocar o token recebido no parâmetro `code` por um token de acesso que será utilizado para requisitar a API:\n\n```\nPOST https://oauth.livepix.gg/oauth2/token\ngrant_type=authorization_code&client_id=<id do cliente>&client_secret=<segredo do cliente>&code=<valor do parametro code>&redirect_uri=<url de redirecionamento>\n```\n\nA requisição acima deve retornar o token de acesso para a conta conforme o exemplo abaixo:\n\n```\n{\n  \"access_token\": \"...\",\n  \"expires_in\": 3600,\n  \"scope\": \"account:read wallet:read webhooks\",\n  \"token_type\": \"bearer\"\n}\n```\n\n## Limite de emissão de tokens\n\nVocê deve utilizar os tokens emitidos até sua expiração para evitar chamadas desnecessárias ao servidor OAuth. Nossa equipe monitora constantemente a atividade em nossa API e caso seja detectado uso incorreto da emissão de tokens, a conta poderá ser encerrada.\n\n# Webhooks\n\nVocê pode configurar uma URL para receber notificações de mensagens e assinaturas recebidas.\n\nAo receber uma mensagem ou assinatura, a URL configurada será chamada com as informações do evento no corpo da requisição. Se a primeira chamada falhar, a URL será chamada a cada 10 minutos até que a mesma retorne uma resposta de sucesso (HTTP 200) em até 24 horas.\n\nPor segurança, apenas algumas informações básicas são enviadas a URL configurada no webhook. Para obter todos os detalhes da mensagem ou assinatura, você deve realizar uma chamada a API.\n          \n\nContact Support:\n Name: Suporte\n Email: ajuda@livepix.gg",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "37932083"
+  },
+  "item": [
+    {
+      "name": "v1",
+      "item": [
+        {
+          "name": "messages",
+          "item": [
+            {
+              "name": "/v1/messages",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/v1/messages?page=1&limit=10",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "v1",
+                    "messages"
+                  ],
+                  "query": [
+                    {
+                      "key": "page",
+                      "value": "1",
+                      "description": "Número da página"
+                    },
+                    {
+                      "key": "limit",
+                      "value": "10",
+                      "description": "Limite de itens por página"
+                    }
+                  ]
+                },
+                "description": "Consultar mensagens recebidas"
+              },
+              "response": [
+                {
+                  "name": "Retorna a lista de mensagens recebidas",
+                  "originalRequest": {
+                    "method": "GET",
+                    "header": [
+                      {
+                        "description": "Added as a part of security scheme: oauth2",
+                        "key": "Authorization",
+                        "value": "<token>"
+                      }
+                    ],
+                    "url": {
+                      "raw": "{{baseUrl}}/v1/messages?page=-52049105&limit=-52049105",
+                      "host": [
+                        "{{baseUrl}}"
+                      ],
+                      "path": [
+                        "v1",
+                        "messages"
+                      ],
+                      "query": [
+                        {
+                          "key": "page",
+                          "value": "-52049105"
+                        },
+                        {
+                          "key": "limit",
+                          "value": "-52049105"
+                        }
+                      ]
+                    }
+                  },
+                  "status": "OK",
+                  "code": 200,
+                  "_postman_previewlanguage": "json",
+                  "header": [
+                    {
+                      "key": "Content-Type",
+                      "value": "application/json"
+                    }
+                  ],
+                  "cookie": [],
+                  "body": "{\n  \"data\": [\n    {\n      \"id\": \"61021c7bdabe5e001225b65b\",\n      \"pixId\": \"E0000000020210727170449258921630\",\n      \"reference\": \"foo\",\n      \"audio\": \"foo\",\n      \"tipper\": \"Harry\",\n      \"message\": \"Olá!\",\n      \"amount\": 1000,\n      \"currency\": \"BRL\",\n      \"flagged\": false,\n      \"createdAt\": \"2021-01-01T00:00:00-03:00\"\n    },\n    {\n      \"id\": \"61021c7bdabe5e001225b65b\",\n      \"pixId\": \"E0000000020210727170449258921630\",\n      \"reference\": \"foo\",\n      \"audio\": \"foo\",\n      \"tipper\": \"Harry\",\n      \"message\": \"Olá!\",\n      \"amount\": 1000,\n      \"currency\": \"BRL\",\n      \"flagged\": false,\n      \"createdAt\": \"2021-01-01T00:00:00-03:00\"\n    }\n  ]\n}"
+                },
+                {
+                  "name": "Autenticação inválida",
+                  "originalRequest": {
+                    "method": "GET",
+                    "header": [
+                      {
+                        "description": "Added as a part of security scheme: oauth2",
+                        "key": "Authorization",
+                        "value": "<token>"
+                      }
+                    ],
+                    "url": {
+                      "raw": "{{baseUrl}}/v1/messages?page=-52049105&limit=-52049105",
+                      "host": [
+                        "{{baseUrl}}"
+                      ],
+                      "path": [
+                        "v1",
+                        "messages"
+                      ],
+                      "query": [
+                        {
+                          "key": "page",
+                          "value": "-52049105"
+                        },
+                        {
+                          "key": "limit",
+                          "value": "-52049105"
+                        }
+                      ]
+                    }
+                  },
+                  "status": "Unauthorized",
+                  "code": 401,
+                  "_postman_previewlanguage": "text",
+                  "header": [
+                    {
+                      "key": "Content-Type",
+                      "value": "text/plain"
+                    }
+                  ],
+                  "cookie": [],
+                  "body": ""
+                },
+                {
+                  "name": "Erro interno do servidor",
+                  "originalRequest": {
+                    "method": "GET",
+                    "header": [
+                      {
+                        "description": "Added as a part of security scheme: oauth2",
+                        "key": "Authorization",
+                        "value": "<token>"
+                      }
+                    ],
+                    "url": {
+                      "raw": "{{baseUrl}}/v1/messages?page=-52049105&limit=-52049105",
+                      "host": [
+                        "{{baseUrl}}"
+                      ],
+                      "path": [
+                        "v1",
+                        "messages"
+                      ],
+                      "query": [
+                        {
+                          "key": "page",
+                          "value": "-52049105"
+                        },
+                        {
+                          "key": "limit",
+                          "value": "-52049105"
+                        }
+                      ]
+                    }
+                  },
+                  "status": "Internal Server Error",
+                  "code": 500,
+                  "_postman_previewlanguage": "text",
+                  "header": [
+                    {
+                      "key": "Content-Type",
+                      "value": "text/plain"
+                    }
+                  ],
+                  "cookie": [],
+                  "body": ""
+                }
+              ]
+            },
+            {
+              "name": "/v1/messages",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"tipper\": \"harrypotter\",\n  \"message\": \"Ola!\",\n  \"amount\": 1000\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/v1/messages",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "v1",
+                    "messages"
+                  ]
+                },
+                "description": "Enviar mensagem"
+              },
+              "response": [
+                {
+                  "name": "Mensagem criada",
+                  "originalRequest": {
+                    "method": "POST",
+                    "header": [
+                      {
+                        "description": "Added as a part of security scheme: oauth2",
+                        "key": "Authorization",
+                        "value": "<token>"
+                      }
+                    ],
+                    "body": {
+                      "mode": "raw",
+                      "raw": "{\n  \"tipper\": \"harrypotter\",\n  \"message\": \"Ola!\",\n  \"amount\": 1000\n}",
+                      "options": {
+                        "raw": {
+                          "language": "json"
+                        }
+                      }
+                    },
+                    "url": {
+                      "raw": "{{baseUrl}}/v1/messages",
+                      "host": [
+                        "{{baseUrl}}"
+                      ],
+                      "path": [
+                        "v1",
+                        "messages"
+                      ]
+                    }
+                  },
+                  "status": "Created",
+                  "code": 201,
+                  "_postman_previewlanguage": "json",
+                  "header": [
+                    {
+                      "key": "Content-Type",
+                      "value": "application/json"
+                    }
+                  ],
+                  "cookie": [],
+                  "body": "{\n  \"data\": {\n    \"id\": \"61021c7bdabe5e001225b65b\",\n    \"code\": \"00020101021126250014BR.GOV.BCB.PIX0103abc52040000530398654041.005802BR5907LivePix6009SAO PAULO62280524619c0255668d931a7a6879b263047F89\",\n    \"qrcode\": \"data:image/png;base64,...\"\n  }\n}"
+                },
+                {
+                  "name": "Autenticação inválida",
+                  "originalRequest": {
+                    "method": "POST",
+                    "header": [
+                      {
+                        "description": "Added as a part of security scheme: oauth2",
+                        "key": "Authorization",
+                        "value": "<token>"
+                      }
+                    ],
+                    "body": {
+                      "mode": "raw",
+                      "raw": "{\n  \"tipper\": \"harrypotter\",\n  \"message\": \"Ola!\",\n  \"amount\": 1000\n}",
+                      "options": {
+                        "raw": {
+                          "language": "json"
+                        }
+                      }
+                    },
+                    "url": {
+                      "raw": "{{baseUrl}}/v1/messages",
+                      "host": [
+                        "{{baseUrl}}"
+                      ],
+                      "path": [
+                        "v1",
+                        "messages"
+                      ]
+                    }
+                  },
+                  "status": "Unauthorized",
+                  "code": 401,
+                  "_postman_previewlanguage": "text",
+                  "header": [
+                    {
+                      "key": "Content-Type",
+                      "value": "text/plain"
+                    }
+                  ],
+                  "cookie": [],
+                  "body": ""
+                },
+                {
+                  "name": "Erro interno do servidor",
+                  "originalRequest": {
+                    "method": "POST",
+                    "header": [
+                      {
+                        "description": "Added as a part of security scheme: oauth2",
+                        "key": "Authorization",
+                        "value": "<token>"
+                      }
+                    ],
+                    "body": {
+                      "mode": "raw",
+                      "raw": "{\n  \"tipper\": \"harrypotter\",\n  \"message\": \"Ola!\",\n  \"amount\": 1000\n}",
+                      "options": {
+                        "raw": {
+                          "language": "json"
+                        }
+                      }
+                    },
+                    "url": {
+                      "raw": "{{baseUrl}}/v1/messages",
+                      "host": [
+                        "{{baseUrl}}"
+                      ],
+                      "path": [
+                        "v1",
+                        "messages"
+                      ]
+                    }
+                  },
+                  "status": "Internal Server Error",
+                  "code": 500,
+                  "_postman_previewlanguage": "text",
+                  "header": [
+                    {
+                      "key": "Content-Type",
+                      "value": "text/plain"
+                    }
+                  ],
+                  "cookie": [],
+                  "body": ""
+                }
+              ]
+            },
+            {
+              "name": "/v1/messages/:messageId",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/v1/messages/:messageId",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "v1",
+                    "messages",
+                    ":messageId"
+                  ],
+                  "variable": [
+                    {
+                      "key": "messageId",
+                      "value": "deserunt amet",
+                      "description": "(Required) ID da mensagem"
+                    }
+                  ]
+                },
+                "description": "Consultar mensagem"
+              },
+              "response": [
+                {
+                  "name": "Retorna a mensagem",
+                  "originalRequest": {
+                    "method": "GET",
+                    "header": [
+                      {
+                        "description": "Added as a part of security scheme: oauth2",
+                        "key": "Authorization",
+                        "value": "<token>"
+                      }
+                    ],
+                    "url": {
+                      "raw": "{{baseUrl}}/v1/messages/:messageId",
+                      "host": [
+                        "{{baseUrl}}"
+                      ],
+                      "path": [
+                        "v1",
+                        "messages",
+                        ":messageId"
+                      ],
+                      "variable": [
+                        {
+                          "key": "messageId",
+                          "value": "deserunt amet",
+                          "description": "(Required) ID da mensagem"
+                        }
+                      ]
+                    }
+                  },
+                  "status": "OK",
+                  "code": 200,
+                  "_postman_previewlanguage": "json",
+                  "header": [
+                    {
+                      "key": "Content-Type",
+                      "value": "application/json"
+                    }
+                  ],
+                  "cookie": [],
+                  "body": "{\n  \"data\": {\n    \"id\": \"61021c7bdabe5e001225b65b\",\n    \"pixId\": \"E0000000020210727170449258921630\",\n    \"reference\": \"foo\",\n    \"audio\": \"foo\",\n    \"tipper\": \"Harry\",\n    \"message\": \"Olá!\",\n    \"amount\": 1000,\n    \"currency\": \"BRL\",\n    \"flagged\": false,\n    \"createdAt\": \"2021-01-01T00:00:00-03:00\"\n  }\n}"
+                },
+                {
+                  "name": "Autenticação inválida",
+                  "originalRequest": {
+                    "method": "GET",
+                    "header": [
+                      {
+                        "description": "Added as a part of security scheme: oauth2",
+                        "key": "Authorization",
+                        "value": "<token>"
+                      }
+                    ],
+                    "url": {
+                      "raw": "{{baseUrl}}/v1/messages/:messageId",
+                      "host": [
+                        "{{baseUrl}}"
+                      ],
+                      "path": [
+                        "v1",
+                        "messages",
+                        ":messageId"
+                      ],
+                      "variable": [
+                        {
+                          "key": "messageId",
+                          "value": "deserunt amet",
+                          "description": "(Required) ID da mensagem"
+                        }
+                      ]
+                    }
+                  },
+                  "status": "Unauthorized",
+                  "code": 401,
+                  "_postman_previewlanguage": "text",
+                  "header": [
+                    {
+                      "key": "Content-Type",
+                      "value": "text/plain"
+                    }
+                  ],
+                  "cookie": [],
+                  "body": ""
+                },
+                {
+                  "name": "Mensagem não existe",
+                  "originalRequest": {
+                    "method": "GET",
+                    "header": [
+                      {
+                        "description": "Added as a part of security scheme: oauth2",
+                        "key": "Authorization",
+                        "value": "<token>"
+                      }
+                    ],
+                    "url": {
+                      "raw": "{{baseUrl}}/v1/messages/:messageId",
+                      "host": [
+                        "{{baseUrl}}"
+                      ],
+                      "path": [
+                        "v1",
+                        "messages",
+                        ":messageId"
+                      ],
+                      "variable": [
+                        {
+                          "key": "messageId",
+                          "value": "deserunt amet",
+                          "description": "(Required) ID da mensagem"
+                        }
+                      ]
+                    }
+                  },
+                  "status": "Not Found",
+                  "code": 404,
+                  "_postman_previewlanguage": "text",
+                  "header": [
+                    {
+                      "key": "Content-Type",
+                      "value": "text/plain"
+                    }
+                  ],
+                  "cookie": [],
+                  "body": ""
+                },
+                {
+                  "name": "Erro interno do servidor",
+                  "originalRequest": {
+                    "method": "GET",
+                    "header": [
+                      {
+                        "description": "Added as a part of security scheme: oauth2",
+                        "key": "Authorization",
+                        "value": "<token>"
+                      }
+                    ],
+                    "url": {
+                      "raw": "{{baseUrl}}/v1/messages/:messageId",
+                      "host": [
+                        "{{baseUrl}}"
+                      ],
+                      "path": [
+                        "v1",
+                        "messages",
+                        ":messageId"
+                      ],
+                      "variable": [
+                        {
+                          "key": "messageId",
+                          "value": "deserunt amet",
+                          "description": "(Required) ID da mensagem"
+                        }
+                      ]
+                    }
+                  },
+                  "status": "Internal Server Error",
+                  "code": 500,
+                  "_postman_previewlanguage": "text",
+                  "header": [
+                    {
+                      "key": "Content-Type",
+                      "value": "text/plain"
+                    }
+                  ],
+                  "cookie": [],
+                  "body": ""
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "rewards",
+          "item": [
+            {
+              "name": "/v1/rewards",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/v1/rewards",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "v1",
+                    "rewards"
+                  ]
+                },
+                "description": "Consultar recompensas"
+              },
+              "response": [
+                {
+                  "name": "Retorna a lista de recompensas",
+                  "originalRequest": {
+                    "method": "GET",
+                    "header": [
+                      {
+                        "description": "Added as a part of security scheme: oauth2",
+                        "key": "Authorization",
+                        "value": "<token>"
+                      }
+                    ],
+                    "url": {
+                      "raw": "{{baseUrl}}/v1/rewards",
+                      "host": [
+                        "{{baseUrl}}"
+                      ],
+                      "path": [
+                        "v1",
+                        "rewards"
+                      ]
+                    }
+                  },
+                  "status": "OK",
+                  "code": 200,
+                  "_postman_previewlanguage": "json",
+                  "header": [
+                    {
+                      "key": "Content-Type",
+                      "value": "application/json"
+                    }
+                  ],
+                  "cookie": [],
+                  "body": "{\n  \"data\": [\n    {\n      \"id\": \"61021c7bdabe5e001225b65b\",\n      \"type\": \"discord-role\",\n      \"title\": \"Grupo dos Apoiadores\",\n      \"description\": \"Tenha acesso ao grupo dos apoiadores no Discord!\",\n      \"config\": {},\n      \"amount\": 100,\n      \"status\": \"Enabled\",\n      \"updatedAt\": \"2021-01-01T00:00:00-03:00\",\n      \"createdAt\": \"2021-01-01T00:00:00-03:00\"\n    },\n    {\n      \"id\": \"61021c7bdabe5e001225b65b\",\n      \"type\": \"discord-role\",\n      \"title\": \"Grupo dos Apoiadores\",\n      \"description\": \"Tenha acesso ao grupo dos apoiadores no Discord!\",\n      \"config\": {},\n      \"amount\": 100,\n      \"status\": \"Enabled\",\n      \"updatedAt\": \"2021-01-01T00:00:00-03:00\",\n      \"createdAt\": \"2021-01-01T00:00:00-03:00\"\n    }\n  ]\n}"
+                },
+                {
+                  "name": "Autenticação inválida",
+                  "originalRequest": {
+                    "method": "GET",
+                    "header": [
+                      {
+                        "description": "Added as a part of security scheme: oauth2",
+                        "key": "Authorization",
+                        "value": "<token>"
+                      }
+                    ],
+                    "url": {
+                      "raw": "{{baseUrl}}/v1/rewards",
+                      "host": [
+                        "{{baseUrl}}"
+                      ],
+                      "path": [
+                        "v1",
+                        "rewards"
+                      ]
+                    }
+                  },
+                  "status": "Unauthorized",
+                  "code": 401,
+                  "_postman_previewlanguage": "text",
+                  "header": [
+                    {
+                      "key": "Content-Type",
+                      "value": "text/plain"
+                    }
+                  ],
+                  "cookie": [],
+                  "body": ""
+                },
+                {
+                  "name": "Erro interno do servidor",
+                  "originalRequest": {
+                    "method": "GET",
+                    "header": [
+                      {
+                        "description": "Added as a part of security scheme: oauth2",
+                        "key": "Authorization",
+                        "value": "<token>"
+                      }
+                    ],
+                    "url": {
+                      "raw": "{{baseUrl}}/v1/rewards",
+                      "host": [
+                        "{{baseUrl}}"
+                      ],
+                      "path": [
+                        "v1",
+                        "rewards"
+                      ]
+                    }
+                  },
+                  "status": "Internal Server Error",
+                  "code": 500,
+                  "_postman_previewlanguage": "text",
+                  "header": [
+                    {
+                      "key": "Content-Type",
+                      "value": "text/plain"
+                    }
+                  ],
+                  "cookie": [],
+                  "body": ""
+                }
+              ]
+            },
+            {
+              "name": "/v1/rewards/:rewardId/grants",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/v1/rewards/:rewardId/grants",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "v1",
+                    "rewards",
+                    ":rewardId",
+                    "grants"
+                  ],
+                  "variable": [
+                    {
+                      "key": "rewardId",
+                      "value": "deserunt amet",
+                      "description": "(Required) ID da recompensa"
+                    }
+                  ]
+                },
+                "description": "Consultar recompensas concedidas"
+              },
+              "response": [
+                {
+                  "name": "Retorna a lista de recompensas concedidas",
+                  "originalRequest": {
+                    "method": "GET",
+                    "header": [
+                      {
+                        "description": "Added as a part of security scheme: oauth2",
+                        "key": "Authorization",
+                        "value": "<token>"
+                      }
+                    ],
+                    "url": {
+                      "raw": "{{baseUrl}}/v1/rewards/:rewardId/grants",
+                      "host": [
+                        "{{baseUrl}}"
+                      ],
+                      "path": [
+                        "v1",
+                        "rewards",
+                        ":rewardId",
+                        "grants"
+                      ],
+                      "variable": [
+                        {
+                          "key": "rewardId",
+                          "value": "deserunt amet",
+                          "description": "(Required) ID da recompensa"
+                        }
+                      ]
+                    }
+                  },
+                  "status": "OK",
+                  "code": 200,
+                  "_postman_previewlanguage": "json",
+                  "header": [
+                    {
+                      "key": "Content-Type",
+                      "value": "application/json"
+                    }
+                  ],
+                  "cookie": [],
+                  "body": "{\n  \"data\": [\n    {\n      \"id\": \"61021c7bdabe5e001225b65b\",\n      \"user\": {\n        \"id\": \"61021c7bdabe5e001225b65b\",\n        \"username\": \"harrypotter\"\n      },\n      \"data\": {},\n      \"status\": \"Enabled\",\n      \"updatedAt\": \"2021-01-01T00:00:00-03:00\",\n      \"createdAt\": \"2021-01-01T00:00:00-03:00\"\n    },\n    {\n      \"id\": \"61021c7bdabe5e001225b65b\",\n      \"user\": {\n        \"id\": \"61021c7bdabe5e001225b65b\",\n        \"username\": \"harrypotter\"\n      },\n      \"data\": {},\n      \"status\": \"Enabled\",\n      \"updatedAt\": \"2021-01-01T00:00:00-03:00\",\n      \"createdAt\": \"2021-01-01T00:00:00-03:00\"\n    }\n  ]\n}"
+                },
+                {
+                  "name": "Autenticação inválida",
+                  "originalRequest": {
+                    "method": "GET",
+                    "header": [
+                      {
+                        "description": "Added as a part of security scheme: oauth2",
+                        "key": "Authorization",
+                        "value": "<token>"
+                      }
+                    ],
+                    "url": {
+                      "raw": "{{baseUrl}}/v1/rewards/:rewardId/grants",
+                      "host": [
+                        "{{baseUrl}}"
+                      ],
+                      "path": [
+                        "v1",
+                        "rewards",
+                        ":rewardId",
+                        "grants"
+                      ],
+                      "variable": [
+                        {
+                          "key": "rewardId",
+                          "value": "deserunt amet",
+                          "description": "(Required) ID da recompensa"
+                        }
+                      ]
+                    }
+                  },
+                  "status": "Unauthorized",
+                  "code": 401,
+                  "_postman_previewlanguage": "text",
+                  "header": [
+                    {
+                      "key": "Content-Type",
+                      "value": "text/plain"
+                    }
+                  ],
+                  "cookie": [],
+                  "body": ""
+                },
+                {
+                  "name": "Erro interno do servidor",
+                  "originalRequest": {
+                    "method": "GET",
+                    "header": [
+                      {
+                        "description": "Added as a part of security scheme: oauth2",
+                        "key": "Authorization",
+                        "value": "<token>"
+                      }
+                    ],
+                    "url": {
+                      "raw": "{{baseUrl}}/v1/rewards/:rewardId/grants",
+                      "host": [
+                        "{{baseUrl}}"
+                      ],
+                      "path": [
+                        "v1",
+                        "rewards",
+                        ":rewardId",
+                        "grants"
+                      ],
+                      "variable": [
+                        {
+                          "key": "rewardId",
+                          "value": "deserunt amet",
+                          "description": "(Required) ID da recompensa"
+                        }
+                      ]
+                    }
+                  },
+                  "status": "Internal Server Error",
+                  "code": 500,
+                  "_postman_previewlanguage": "text",
+                  "header": [
+                    {
+                      "key": "Content-Type",
+                      "value": "text/plain"
+                    }
+                  ],
+                  "cookie": [],
+                  "body": ""
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "subscriptions",
+          "item": [
+            {
+              "name": "{subscription Id}",
+              "item": [
+                {
+                  "name": "/v1/subscriptions/:subscriptionId",
+                  "request": {
+                    "method": "GET",
+                    "header": [
+                      {
+                        "key": "Accept",
+                        "value": "application/json"
+                      }
+                    ],
+                    "url": {
+                      "raw": "{{baseUrl}}/v1/subscriptions/:subscriptionId",
+                      "host": [
+                        "{{baseUrl}}"
+                      ],
+                      "path": [
+                        "v1",
+                        "subscriptions",
+                        ":subscriptionId"
+                      ],
+                      "variable": [
+                        {
+                          "key": "subscriptionId",
+                          "value": "deserunt amet",
+                          "description": "(Required) ID da assinatura"
+                        }
+                      ]
+                    },
+                    "description": "Consultar assinatura"
+                  },
+                  "response": [
+                    {
+                      "name": "Retorna a assinatura",
+                      "originalRequest": {
+                        "method": "GET",
+                        "header": [
+                          {
+                            "description": "Added as a part of security scheme: oauth2",
+                            "key": "Authorization",
+                            "value": "<token>"
+                          }
+                        ],
+                        "url": {
+                          "raw": "{{baseUrl}}/v1/subscriptions/:subscriptionId",
+                          "host": [
+                            "{{baseUrl}}"
+                          ],
+                          "path": [
+                            "v1",
+                            "subscriptions",
+                            ":subscriptionId"
+                          ],
+                          "variable": [
+                            {
+                              "key": "subscriptionId",
+                              "value": "deserunt amet",
+                              "description": "(Required) ID da assinatura"
+                            }
+                          ]
+                        }
+                      },
+                      "status": "OK",
+                      "code": 200,
+                      "_postman_previewlanguage": "json",
+                      "header": [
+                        {
+                          "key": "Content-Type",
+                          "value": "application/json"
+                        }
+                      ],
+                      "cookie": [],
+                      "body": "{\n  \"data\": {\n    \"id\": \"61021c7bdabe5e001225b65b\",\n    \"subscriber\": \"harrypotter\",\n    \"months\": 3,\n    \"amount\": 1000,\n    \"renewAt\": \"2021-01-01T00:00:00-03:00\",\n    \"updatedAt\": \"2021-01-01T00:00:00-03:00\",\n    \"createdAt\": \"2021-01-01T00:00:00-03:00\"\n  }\n}"
+                    },
+                    {
+                      "name": "Autenticação inválida",
+                      "originalRequest": {
+                        "method": "GET",
+                        "header": [
+                          {
+                            "description": "Added as a part of security scheme: oauth2",
+                            "key": "Authorization",
+                            "value": "<token>"
+                          }
+                        ],
+                        "url": {
+                          "raw": "{{baseUrl}}/v1/subscriptions/:subscriptionId",
+                          "host": [
+                            "{{baseUrl}}"
+                          ],
+                          "path": [
+                            "v1",
+                            "subscriptions",
+                            ":subscriptionId"
+                          ],
+                          "variable": [
+                            {
+                              "key": "subscriptionId",
+                              "value": "deserunt amet",
+                              "description": "(Required) ID da assinatura"
+                            }
+                          ]
+                        }
+                      },
+                      "status": "Unauthorized",
+                      "code": 401,
+                      "_postman_previewlanguage": "text",
+                      "header": [
+                        {
+                          "key": "Content-Type",
+                          "value": "text/plain"
+                        }
+                      ],
+                      "cookie": [],
+                      "body": ""
+                    },
+                    {
+                      "name": "Assinatura não existe",
+                      "originalRequest": {
+                        "method": "GET",
+                        "header": [
+                          {
+                            "description": "Added as a part of security scheme: oauth2",
+                            "key": "Authorization",
+                            "value": "<token>"
+                          }
+                        ],
+                        "url": {
+                          "raw": "{{baseUrl}}/v1/subscriptions/:subscriptionId",
+                          "host": [
+                            "{{baseUrl}}"
+                          ],
+                          "path": [
+                            "v1",
+                            "subscriptions",
+                            ":subscriptionId"
+                          ],
+                          "variable": [
+                            {
+                              "key": "subscriptionId",
+                              "value": "deserunt amet",
+                              "description": "(Required) ID da assinatura"
+                            }
+                          ]
+                        }
+                      },
+                      "status": "Not Found",
+                      "code": 404,
+                      "_postman_previewlanguage": "text",
+                      "header": [
+                        {
+                          "key": "Content-Type",
+                          "value": "text/plain"
+                        }
+                      ],
+                      "cookie": [],
+                      "body": ""
+                    },
+                    {
+                      "name": "Erro interno do servidor",
+                      "originalRequest": {
+                        "method": "GET",
+                        "header": [
+                          {
+                            "description": "Added as a part of security scheme: oauth2",
+                            "key": "Authorization",
+                            "value": "<token>"
+                          }
+                        ],
+                        "url": {
+                          "raw": "{{baseUrl}}/v1/subscriptions/:subscriptionId",
+                          "host": [
+                            "{{baseUrl}}"
+                          ],
+                          "path": [
+                            "v1",
+                            "subscriptions",
+                            ":subscriptionId"
+                          ],
+                          "variable": [
+                            {
+                              "key": "subscriptionId",
+                              "value": "deserunt amet",
+                              "description": "(Required) ID da assinatura"
+                            }
+                          ]
+                        }
+                      },
+                      "status": "Internal Server Error",
+                      "code": 500,
+                      "_postman_previewlanguage": "text",
+                      "header": [
+                        {
+                          "key": "Content-Type",
+                          "value": "text/plain"
+                        }
+                      ],
+                      "cookie": [],
+                      "body": ""
+                    }
+                  ]
+                },
+                {
+                  "name": "/v1/subscriptions/:subscriptionId/transactions",
+                  "request": {
+                    "method": "GET",
+                    "header": [
+                      {
+                        "key": "Accept",
+                        "value": "application/json"
+                      }
+                    ],
+                    "url": {
+                      "raw": "{{baseUrl}}/v1/subscriptions/:subscriptionId/transactions?page=-52049105&limit=-52049105",
+                      "host": [
+                        "{{baseUrl}}"
+                      ],
+                      "path": [
+                        "v1",
+                        "subscriptions",
+                        ":subscriptionId",
+                        "transactions"
+                      ],
+                      "query": [
+                        {
+                          "key": "page",
+                          "value": "-52049105",
+                          "description": "Número da página"
+                        },
+                        {
+                          "key": "limit",
+                          "value": "-52049105",
+                          "description": "Limite de itens por página"
+                        }
+                      ],
+                      "variable": [
+                        {
+                          "key": "subscriptionId",
+                          "value": "deserunt amet",
+                          "description": "(Required) ID da assinatura"
+                        }
+                      ]
+                    },
+                    "description": "Consultar pagamentos da assinatura"
+                  },
+                  "response": [
+                    {
+                      "name": "Retorna a lista de pagamentos da assinatura",
+                      "originalRequest": {
+                        "method": "GET",
+                        "header": [
+                          {
+                            "description": "Added as a part of security scheme: oauth2",
+                            "key": "Authorization",
+                            "value": "<token>"
+                          }
+                        ],
+                        "url": {
+                          "raw": "{{baseUrl}}/v1/subscriptions/:subscriptionId/transactions?page=-52049105&limit=-52049105",
+                          "host": [
+                            "{{baseUrl}}"
+                          ],
+                          "path": [
+                            "v1",
+                            "subscriptions",
+                            ":subscriptionId",
+                            "transactions"
+                          ],
+                          "query": [
+                            {
+                              "key": "page",
+                              "value": "-52049105"
+                            },
+                            {
+                              "key": "limit",
+                              "value": "-52049105"
+                            }
+                          ],
+                          "variable": [
+                            {
+                              "key": "subscriptionId",
+                              "value": "deserunt amet",
+                              "description": "(Required) ID da assinatura"
+                            }
+                          ]
+                        }
+                      },
+                      "status": "OK",
+                      "code": 200,
+                      "_postman_previewlanguage": "json",
+                      "header": [
+                        {
+                          "key": "Content-Type",
+                          "value": "application/json"
+                        }
+                      ],
+                      "cookie": [],
+                      "body": "{\n  \"data\": [\n    {\n      \"id\": \"61021c7bdabe5e001225b65b\",\n      \"pixId\": \"E0000000020210727170449258921630\",\n      \"amount\": 1000,\n      \"createdAt\": \"2021-01-01T00:00:00-03:00\"\n    },\n    {\n      \"id\": \"61021c7bdabe5e001225b65b\",\n      \"pixId\": \"E0000000020210727170449258921630\",\n      \"amount\": 1000,\n      \"createdAt\": \"2021-01-01T00:00:00-03:00\"\n    }\n  ]\n}"
+                    },
+                    {
+                      "name": "Autenticação inválida",
+                      "originalRequest": {
+                        "method": "GET",
+                        "header": [
+                          {
+                            "description": "Added as a part of security scheme: oauth2",
+                            "key": "Authorization",
+                            "value": "<token>"
+                          }
+                        ],
+                        "url": {
+                          "raw": "{{baseUrl}}/v1/subscriptions/:subscriptionId/transactions?page=-52049105&limit=-52049105",
+                          "host": [
+                            "{{baseUrl}}"
+                          ],
+                          "path": [
+                            "v1",
+                            "subscriptions",
+                            ":subscriptionId",
+                            "transactions"
+                          ],
+                          "query": [
+                            {
+                              "key": "page",
+                              "value": "-52049105"
+                            },
+                            {
+                              "key": "limit",
+                              "value": "-52049105"
+                            }
+                          ],
+                          "variable": [
+                            {
+                              "key": "subscriptionId",
+                              "value": "deserunt amet",
+                              "description": "(Required) ID da assinatura"
+                            }
+                          ]
+                        }
+                      },
+                      "status": "Unauthorized",
+                      "code": 401,
+                      "_postman_previewlanguage": "text",
+                      "header": [
+                        {
+                          "key": "Content-Type",
+                          "value": "text/plain"
+                        }
+                      ],
+                      "cookie": [],
+                      "body": ""
+                    },
+                    {
+                      "name": "Erro interno do servidor",
+                      "originalRequest": {
+                        "method": "GET",
+                        "header": [
+                          {
+                            "description": "Added as a part of security scheme: oauth2",
+                            "key": "Authorization",
+                            "value": "<token>"
+                          }
+                        ],
+                        "url": {
+                          "raw": "{{baseUrl}}/v1/subscriptions/:subscriptionId/transactions?page=-52049105&limit=-52049105",
+                          "host": [
+                            "{{baseUrl}}"
+                          ],
+                          "path": [
+                            "v1",
+                            "subscriptions",
+                            ":subscriptionId",
+                            "transactions"
+                          ],
+                          "query": [
+                            {
+                              "key": "page",
+                              "value": "-52049105"
+                            },
+                            {
+                              "key": "limit",
+                              "value": "-52049105"
+                            }
+                          ],
+                          "variable": [
+                            {
+                              "key": "subscriptionId",
+                              "value": "deserunt amet",
+                              "description": "(Required) ID da assinatura"
+                            }
+                          ]
+                        }
+                      },
+                      "status": "Internal Server Error",
+                      "code": 500,
+                      "_postman_previewlanguage": "text",
+                      "header": [
+                        {
+                          "key": "Content-Type",
+                          "value": "text/plain"
+                        }
+                      ],
+                      "cookie": [],
+                      "body": ""
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "name": "/v1/subscriptions",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/v1/subscriptions?page=-52049105&limit=-52049105",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "v1",
+                    "subscriptions"
+                  ],
+                  "query": [
+                    {
+                      "key": "page",
+                      "value": "-52049105",
+                      "description": "Número da página"
+                    },
+                    {
+                      "key": "limit",
+                      "value": "-52049105",
+                      "description": "Limite de itens por página"
+                    }
+                  ]
+                },
+                "description": "Consultar assinaturas recebidas"
+              },
+              "response": [
+                {
+                  "name": "Retorna a lista de assinaturas recebidas",
+                  "originalRequest": {
+                    "method": "GET",
+                    "header": [
+                      {
+                        "description": "Added as a part of security scheme: oauth2",
+                        "key": "Authorization",
+                        "value": "<token>"
+                      }
+                    ],
+                    "url": {
+                      "raw": "{{baseUrl}}/v1/subscriptions?page=-52049105&limit=-52049105",
+                      "host": [
+                        "{{baseUrl}}"
+                      ],
+                      "path": [
+                        "v1",
+                        "subscriptions"
+                      ],
+                      "query": [
+                        {
+                          "key": "page",
+                          "value": "-52049105"
+                        },
+                        {
+                          "key": "limit",
+                          "value": "-52049105"
+                        }
+                      ]
+                    }
+                  },
+                  "status": "OK",
+                  "code": 200,
+                  "_postman_previewlanguage": "json",
+                  "header": [
+                    {
+                      "key": "Content-Type",
+                      "value": "application/json"
+                    }
+                  ],
+                  "cookie": [],
+                  "body": "{\n  \"data\": [\n    {\n      \"id\": \"61021c7bdabe5e001225b65b\",\n      \"subscriber\": \"harrypotter\",\n      \"months\": 3,\n      \"amount\": 1000,\n      \"renewAt\": \"2021-01-01T00:00:00-03:00\",\n      \"updatedAt\": \"2021-01-01T00:00:00-03:00\",\n      \"createdAt\": \"2021-01-01T00:00:00-03:00\"\n    },\n    {\n      \"id\": \"61021c7bdabe5e001225b65b\",\n      \"subscriber\": \"harrypotter\",\n      \"months\": 3,\n      \"amount\": 1000,\n      \"renewAt\": \"2021-01-01T00:00:00-03:00\",\n      \"updatedAt\": \"2021-01-01T00:00:00-03:00\",\n      \"createdAt\": \"2021-01-01T00:00:00-03:00\"\n    }\n  ]\n}"
+                },
+                {
+                  "name": "Autenticação inválida",
+                  "originalRequest": {
+                    "method": "GET",
+                    "header": [
+                      {
+                        "description": "Added as a part of security scheme: oauth2",
+                        "key": "Authorization",
+                        "value": "<token>"
+                      }
+                    ],
+                    "url": {
+                      "raw": "{{baseUrl}}/v1/subscriptions?page=-52049105&limit=-52049105",
+                      "host": [
+                        "{{baseUrl}}"
+                      ],
+                      "path": [
+                        "v1",
+                        "subscriptions"
+                      ],
+                      "query": [
+                        {
+                          "key": "page",
+                          "value": "-52049105"
+                        },
+                        {
+                          "key": "limit",
+                          "value": "-52049105"
+                        }
+                      ]
+                    }
+                  },
+                  "status": "Unauthorized",
+                  "code": 401,
+                  "_postman_previewlanguage": "text",
+                  "header": [
+                    {
+                      "key": "Content-Type",
+                      "value": "text/plain"
+                    }
+                  ],
+                  "cookie": [],
+                  "body": ""
+                },
+                {
+                  "name": "Erro interno do servidor",
+                  "originalRequest": {
+                    "method": "GET",
+                    "header": [
+                      {
+                        "description": "Added as a part of security scheme: oauth2",
+                        "key": "Authorization",
+                        "value": "<token>"
+                      }
+                    ],
+                    "url": {
+                      "raw": "{{baseUrl}}/v1/subscriptions?page=-52049105&limit=-52049105",
+                      "host": [
+                        "{{baseUrl}}"
+                      ],
+                      "path": [
+                        "v1",
+                        "subscriptions"
+                      ],
+                      "query": [
+                        {
+                          "key": "page",
+                          "value": "-52049105"
+                        },
+                        {
+                          "key": "limit",
+                          "value": "-52049105"
+                        }
+                      ]
+                    }
+                  },
+                  "status": "Internal Server Error",
+                  "code": 500,
+                  "_postman_previewlanguage": "text",
+                  "header": [
+                    {
+                      "key": "Content-Type",
+                      "value": "text/plain"
+                    }
+                  ],
+                  "cookie": [],
+                  "body": ""
+                }
+              ]
+            },
+            {
+              "name": "/v1/subscriptions",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"amount\": 1000,\n  \"subscriber\": {\n    \"username\": \"harrypotter\",\n    \"email\": \"harry.potter@hogwarts.com\"\n  }\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/v1/subscriptions",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "v1",
+                    "subscriptions"
+                  ]
+                },
+                "description": "Enviar assinatura"
+              },
+              "response": [
+                {
+                  "name": "Assinatura criada",
+                  "originalRequest": {
+                    "method": "POST",
+                    "header": [
+                      {
+                        "description": "Added as a part of security scheme: oauth2",
+                        "key": "Authorization",
+                        "value": "<token>"
+                      }
+                    ],
+                    "body": {
+                      "mode": "raw",
+                      "raw": "{\n  \"amount\": 1000,\n  \"subscriber\": {\n    \"username\": \"harrypotter\",\n    \"email\": \"harry.potter@hogwarts.com\"\n  }\n}",
+                      "options": {
+                        "raw": {
+                          "language": "json"
+                        }
+                      }
+                    },
+                    "url": {
+                      "raw": "{{baseUrl}}/v1/subscriptions",
+                      "host": [
+                        "{{baseUrl}}"
+                      ],
+                      "path": [
+                        "v1",
+                        "subscriptions"
+                      ]
+                    }
+                  },
+                  "status": "Created",
+                  "code": 201,
+                  "_postman_previewlanguage": "json",
+                  "header": [
+                    {
+                      "key": "Content-Type",
+                      "value": "application/json"
+                    }
+                  ],
+                  "cookie": [],
+                  "body": "{\n  \"data\": {\n    \"id\": \"61021c7bdabe5e001225b65b\",\n    \"code\": \"00020101021126250014BR.GOV.BCB.PIX0103abc52040000530398654041.005802BR5907LivePix6009SAO PAULO62280524619c0255668d931a7a6879b263047F89\",\n    \"qrcode\": \"data:image/png;base64,...\"\n  }\n}"
+                },
+                {
+                  "name": "Autenticação inválida",
+                  "originalRequest": {
+                    "method": "POST",
+                    "header": [
+                      {
+                        "description": "Added as a part of security scheme: oauth2",
+                        "key": "Authorization",
+                        "value": "<token>"
+                      }
+                    ],
+                    "body": {
+                      "mode": "raw",
+                      "raw": "{\n  \"amount\": 1000,\n  \"subscriber\": {\n    \"username\": \"harrypotter\",\n    \"email\": \"harry.potter@hogwarts.com\"\n  }\n}",
+                      "options": {
+                        "raw": {
+                          "language": "json"
+                        }
+                      }
+                    },
+                    "url": {
+                      "raw": "{{baseUrl}}/v1/subscriptions",
+                      "host": [
+                        "{{baseUrl}}"
+                      ],
+                      "path": [
+                        "v1",
+                        "subscriptions"
+                      ]
+                    }
+                  },
+                  "status": "Unauthorized",
+                  "code": 401,
+                  "_postman_previewlanguage": "text",
+                  "header": [
+                    {
+                      "key": "Content-Type",
+                      "value": "text/plain"
+                    }
+                  ],
+                  "cookie": [],
+                  "body": ""
+                },
+                {
+                  "name": "Erro interno do servidor",
+                  "originalRequest": {
+                    "method": "POST",
+                    "header": [
+                      {
+                        "description": "Added as a part of security scheme: oauth2",
+                        "key": "Authorization",
+                        "value": "<token>"
+                      }
+                    ],
+                    "body": {
+                      "mode": "raw",
+                      "raw": "{\n  \"amount\": 1000,\n  \"subscriber\": {\n    \"username\": \"harrypotter\",\n    \"email\": \"harry.potter@hogwarts.com\"\n  }\n}",
+                      "options": {
+                        "raw": {
+                          "language": "json"
+                        }
+                      }
+                    },
+                    "url": {
+                      "raw": "{{baseUrl}}/v1/subscriptions",
+                      "host": [
+                        "{{baseUrl}}"
+                      ],
+                      "path": [
+                        "v1",
+                        "subscriptions"
+                      ]
+                    }
+                  },
+                  "status": "Internal Server Error",
+                  "code": 500,
+                  "_postman_previewlanguage": "text",
+                  "header": [
+                    {
+                      "key": "Content-Type",
+                      "value": "text/plain"
+                    }
+                  ],
+                  "cookie": [],
+                  "body": ""
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "wallet",
+          "item": [
+            {
+              "name": "/v1/wallet",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/v1/wallet",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "v1",
+                    "wallet"
+                  ]
+                },
+                "description": "Consultar saldo"
+              },
+              "response": [
+                {
+                  "name": "Retorna o saldo da conta autenticada",
+                  "originalRequest": {
+                    "method": "GET",
+                    "header": [
+                      {
+                        "description": "Added as a part of security scheme: oauth2",
+                        "key": "Authorization",
+                        "value": "<token>"
+                      }
+                    ],
+                    "url": {
+                      "raw": "{{baseUrl}}/v1/wallet",
+                      "host": [
+                        "{{baseUrl}}"
+                      ],
+                      "path": [
+                        "v1",
+                        "wallet"
+                      ]
+                    }
+                  },
+                  "status": "OK",
+                  "code": 200,
+                  "_postman_previewlanguage": "json",
+                  "header": [
+                    {
+                      "key": "Content-Type",
+                      "value": "application/json"
+                    }
+                  ],
+                  "cookie": [],
+                  "body": "{\n  \"data\": {\n    \"balance\": 0\n  }\n}"
+                },
+                {
+                  "name": "Autenticação inválida",
+                  "originalRequest": {
+                    "method": "GET",
+                    "header": [
+                      {
+                        "description": "Added as a part of security scheme: oauth2",
+                        "key": "Authorization",
+                        "value": "<token>"
+                      }
+                    ],
+                    "url": {
+                      "raw": "{{baseUrl}}/v1/wallet",
+                      "host": [
+                        "{{baseUrl}}"
+                      ],
+                      "path": [
+                        "v1",
+                        "wallet"
+                      ]
+                    }
+                  },
+                  "status": "Unauthorized",
+                  "code": 401,
+                  "_postman_previewlanguage": "text",
+                  "header": [
+                    {
+                      "key": "Content-Type",
+                      "value": "text/plain"
+                    }
+                  ],
+                  "cookie": [],
+                  "body": ""
+                },
+                {
+                  "name": "Erro interno do servidor",
+                  "originalRequest": {
+                    "method": "GET",
+                    "header": [
+                      {
+                        "description": "Added as a part of security scheme: oauth2",
+                        "key": "Authorization",
+                        "value": "<token>"
+                      }
+                    ],
+                    "url": {
+                      "raw": "{{baseUrl}}/v1/wallet",
+                      "host": [
+                        "{{baseUrl}}"
+                      ],
+                      "path": [
+                        "v1",
+                        "wallet"
+                      ]
+                    }
+                  },
+                  "status": "Internal Server Error",
+                  "code": 500,
+                  "_postman_previewlanguage": "text",
+                  "header": [
+                    {
+                      "key": "Content-Type",
+                      "value": "text/plain"
+                    }
+                  ],
+                  "cookie": [],
+                  "body": ""
+                }
+              ]
+            },
+            {
+              "name": "/v1/wallet/transactions",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/v1/wallet/transactions?after=deserunt amet",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "v1",
+                    "wallet",
+                    "transactions"
+                  ],
+                  "query": [
+                    {
+                      "key": "after",
+                      "value": "deserunt amet",
+                      "description": "Último timestamp da página atual"
+                    }
+                  ]
+                },
+                "description": "Consultar transações"
+              },
+              "response": [
+                {
+                  "name": "Retorna a lista de transações da carteira",
+                  "originalRequest": {
+                    "method": "GET",
+                    "header": [
+                      {
+                        "description": "Added as a part of security scheme: oauth2",
+                        "key": "Authorization",
+                        "value": "<token>"
+                      }
+                    ],
+                    "url": {
+                      "raw": "{{baseUrl}}/v1/wallet/transactions?after=deserunt amet",
+                      "host": [
+                        "{{baseUrl}}"
+                      ],
+                      "path": [
+                        "v1",
+                        "wallet",
+                        "transactions"
+                      ],
+                      "query": [
+                        {
+                          "key": "after",
+                          "value": "deserunt amet"
+                        }
+                      ]
+                    }
+                  },
+                  "status": "OK",
+                  "code": 200,
+                  "_postman_previewlanguage": "json",
+                  "header": [
+                    {
+                      "key": "Content-Type",
+                      "value": "application/json"
+                    }
+                  ],
+                  "cookie": [],
+                  "body": "{\n  \"data\": [\n    {\n      \"proof\": \"E0000000020210727170449258921630\",\n      \"amount\": 100,\n      \"balance\": 100,\n      \"timestamp\": 1637626062\n    },\n    {\n      \"proof\": \"E0000000020210727170449258921630\",\n      \"amount\": 100,\n      \"balance\": 100,\n      \"timestamp\": 1637626062\n    }\n  ]\n}"
+                },
+                {
+                  "name": "Autenticação inválida",
+                  "originalRequest": {
+                    "method": "GET",
+                    "header": [
+                      {
+                        "description": "Added as a part of security scheme: oauth2",
+                        "key": "Authorization",
+                        "value": "<token>"
+                      }
+                    ],
+                    "url": {
+                      "raw": "{{baseUrl}}/v1/wallet/transactions?after=deserunt amet",
+                      "host": [
+                        "{{baseUrl}}"
+                      ],
+                      "path": [
+                        "v1",
+                        "wallet",
+                        "transactions"
+                      ],
+                      "query": [
+                        {
+                          "key": "after",
+                          "value": "deserunt amet"
+                        }
+                      ]
+                    }
+                  },
+                  "status": "Unauthorized",
+                  "code": 401,
+                  "_postman_previewlanguage": "text",
+                  "header": [
+                    {
+                      "key": "Content-Type",
+                      "value": "text/plain"
+                    }
+                  ],
+                  "cookie": [],
+                  "body": ""
+                },
+                {
+                  "name": "Erro interno do servidor",
+                  "originalRequest": {
+                    "method": "GET",
+                    "header": [
+                      {
+                        "description": "Added as a part of security scheme: oauth2",
+                        "key": "Authorization",
+                        "value": "<token>"
+                      }
+                    ],
+                    "url": {
+                      "raw": "{{baseUrl}}/v1/wallet/transactions?after=deserunt amet",
+                      "host": [
+                        "{{baseUrl}}"
+                      ],
+                      "path": [
+                        "v1",
+                        "wallet",
+                        "transactions"
+                      ],
+                      "query": [
+                        {
+                          "key": "after",
+                          "value": "deserunt amet"
+                        }
+                      ]
+                    }
+                  },
+                  "status": "Internal Server Error",
+                  "code": 500,
+                  "_postman_previewlanguage": "text",
+                  "header": [
+                    {
+                      "key": "Content-Type",
+                      "value": "text/plain"
+                    }
+                  ],
+                  "cookie": [],
+                  "body": ""
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "webhooks",
+          "item": [
+            {
+              "name": "/v1/webhooks",
+              "request": {
+                "method": "GET",
+                "header": [
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/v1/webhooks?page=-52049105&limit=-52049105",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "v1",
+                    "webhooks"
+                  ],
+                  "query": [
+                    {
+                      "key": "page",
+                      "value": "-52049105",
+                      "description": "Número da página"
+                    },
+                    {
+                      "key": "limit",
+                      "value": "-52049105",
+                      "description": "Limite de itens por página"
+                    }
+                  ]
+                },
+                "description": "Consultar webhooks"
+              },
+              "response": [
+                {
+                  "name": "Retorna a lista de webhooks configurados",
+                  "originalRequest": {
+                    "method": "GET",
+                    "header": [
+                      {
+                        "description": "Added as a part of security scheme: oauth2",
+                        "key": "Authorization",
+                        "value": "<token>"
+                      }
+                    ],
+                    "url": {
+                      "raw": "{{baseUrl}}/v1/webhooks?page=-52049105&limit=-52049105",
+                      "host": [
+                        "{{baseUrl}}"
+                      ],
+                      "path": [
+                        "v1",
+                        "webhooks"
+                      ],
+                      "query": [
+                        {
+                          "key": "page",
+                          "value": "-52049105"
+                        },
+                        {
+                          "key": "limit",
+                          "value": "-52049105"
+                        }
+                      ]
+                    }
+                  },
+                  "status": "OK",
+                  "code": 200,
+                  "_postman_previewlanguage": "json",
+                  "header": [
+                    {
+                      "key": "Content-Type",
+                      "value": "application/json"
+                    }
+                  ],
+                  "cookie": [],
+                  "body": "{\n  \"data\": [\n    {\n      \"id\": \"61021c7bdabe5e001225b65b\",\n      \"url\": \"https://example.com/webhook\"\n    },\n    {\n      \"id\": \"61021c7bdabe5e001225b65b\",\n      \"url\": \"https://example.com/webhook\"\n    }\n  ]\n}"
+                },
+                {
+                  "name": "Autenticação inválida",
+                  "originalRequest": {
+                    "method": "GET",
+                    "header": [
+                      {
+                        "description": "Added as a part of security scheme: oauth2",
+                        "key": "Authorization",
+                        "value": "<token>"
+                      }
+                    ],
+                    "url": {
+                      "raw": "{{baseUrl}}/v1/webhooks?page=-52049105&limit=-52049105",
+                      "host": [
+                        "{{baseUrl}}"
+                      ],
+                      "path": [
+                        "v1",
+                        "webhooks"
+                      ],
+                      "query": [
+                        {
+                          "key": "page",
+                          "value": "-52049105"
+                        },
+                        {
+                          "key": "limit",
+                          "value": "-52049105"
+                        }
+                      ]
+                    }
+                  },
+                  "status": "Unauthorized",
+                  "code": 401,
+                  "_postman_previewlanguage": "text",
+                  "header": [
+                    {
+                      "key": "Content-Type",
+                      "value": "text/plain"
+                    }
+                  ],
+                  "cookie": [],
+                  "body": ""
+                },
+                {
+                  "name": "Erro interno do servidor",
+                  "originalRequest": {
+                    "method": "GET",
+                    "header": [
+                      {
+                        "description": "Added as a part of security scheme: oauth2",
+                        "key": "Authorization",
+                        "value": "<token>"
+                      }
+                    ],
+                    "url": {
+                      "raw": "{{baseUrl}}/v1/webhooks?page=-52049105&limit=-52049105",
+                      "host": [
+                        "{{baseUrl}}"
+                      ],
+                      "path": [
+                        "v1",
+                        "webhooks"
+                      ],
+                      "query": [
+                        {
+                          "key": "page",
+                          "value": "-52049105"
+                        },
+                        {
+                          "key": "limit",
+                          "value": "-52049105"
+                        }
+                      ]
+                    }
+                  },
+                  "status": "Internal Server Error",
+                  "code": 500,
+                  "_postman_previewlanguage": "text",
+                  "header": [
+                    {
+                      "key": "Content-Type",
+                      "value": "text/plain"
+                    }
+                  ],
+                  "cookie": [],
+                  "body": ""
+                }
+              ]
+            },
+            {
+              "name": "/v1/webhooks",
+              "request": {
+                "method": "POST",
+                "header": [
+                  {
+                    "key": "Content-Type",
+                    "value": "application/json"
+                  },
+                  {
+                    "key": "Accept",
+                    "value": "application/json"
+                  }
+                ],
+                "body": {
+                  "mode": "raw",
+                  "raw": "{\n  \"url\": \"https://example.com/webhook\"\n}",
+                  "options": {
+                    "raw": {
+                      "language": "json"
+                    }
+                  }
+                },
+                "url": {
+                  "raw": "{{baseUrl}}/v1/webhooks",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "v1",
+                    "webhooks"
+                  ]
+                },
+                "description": "Criar webhook"
+              },
+              "response": [
+                {
+                  "name": "Webhook criado",
+                  "originalRequest": {
+                    "method": "POST",
+                    "header": [],
+                    "body": {
+                      "mode": "raw",
+                      "raw": "{\n  \"url\": \"https://example.com/webhook\"\n}",
+                      "options": {
+                        "raw": {
+                          "language": "json"
+                        }
+                      }
+                    },
+                    "url": {
+                      "raw": "{{baseUrl}}/v1/webhooks",
+                      "host": [
+                        "{{baseUrl}}"
+                      ],
+                      "path": [
+                        "v1",
+                        "webhooks"
+                      ]
+                    }
+                  },
+                  "status": "Created",
+                  "code": 201,
+                  "_postman_previewlanguage": "json",
+                  "header": [
+                    {
+                      "key": "Content-Type",
+                      "value": "application/json"
+                    }
+                  ],
+                  "cookie": [],
+                  "body": "{\n  \"data\": {\n    \"id\": \"61021c7bdabe5e001225b65b\"\n  }\n}"
+                },
+                {
+                  "name": "Autenticação inválida",
+                  "originalRequest": {
+                    "method": "POST",
+                    "header": [],
+                    "body": {
+                      "mode": "raw",
+                      "raw": "{\n  \"url\": \"https://example.com/webhook\"\n}",
+                      "options": {
+                        "raw": {
+                          "language": "json"
+                        }
+                      }
+                    },
+                    "url": {
+                      "raw": "{{baseUrl}}/v1/webhooks",
+                      "host": [
+                        "{{baseUrl}}"
+                      ],
+                      "path": [
+                        "v1",
+                        "webhooks"
+                      ]
+                    }
+                  },
+                  "status": "Unauthorized",
+                  "code": 401,
+                  "_postman_previewlanguage": "text",
+                  "header": [
+                    {
+                      "key": "Content-Type",
+                      "value": "text/plain"
+                    }
+                  ],
+                  "cookie": [],
+                  "body": ""
+                },
+                {
+                  "name": "Erro interno do servidor",
+                  "originalRequest": {
+                    "method": "POST",
+                    "header": [],
+                    "body": {
+                      "mode": "raw",
+                      "raw": "{\n  \"url\": \"https://example.com/webhook\"\n}",
+                      "options": {
+                        "raw": {
+                          "language": "json"
+                        }
+                      }
+                    },
+                    "url": {
+                      "raw": "{{baseUrl}}/v1/webhooks",
+                      "host": [
+                        "{{baseUrl}}"
+                      ],
+                      "path": [
+                        "v1",
+                        "webhooks"
+                      ]
+                    }
+                  },
+                  "status": "Internal Server Error",
+                  "code": 500,
+                  "_postman_previewlanguage": "text",
+                  "header": [
+                    {
+                      "key": "Content-Type",
+                      "value": "text/plain"
+                    }
+                  ],
+                  "cookie": [],
+                  "body": ""
+                }
+              ]
+            },
+            {
+              "name": "/v1/webhooks/:webhookId",
+              "request": {
+                "method": "DELETE",
+                "header": [],
+                "url": {
+                  "raw": "{{baseUrl}}/v1/webhooks/:webhookId",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "v1",
+                    "webhooks",
+                    ":webhookId"
+                  ],
+                  "variable": [
+                    {
+                      "key": "webhookId",
+                      "value": "deserunt amet",
+                      "description": "(Required) ID do webhook"
+                    }
+                  ]
+                },
+                "description": "Excluir webhook"
+              },
+              "response": [
+                {
+                  "name": "Webhook removido",
+                  "originalRequest": {
+                    "method": "DELETE",
+                    "header": [
+                      {
+                        "description": "Added as a part of security scheme: oauth2",
+                        "key": "Authorization",
+                        "value": "<token>"
+                      }
+                    ],
+                    "url": {
+                      "raw": "{{baseUrl}}/v1/webhooks/:webhookId",
+                      "host": [
+                        "{{baseUrl}}"
+                      ],
+                      "path": [
+                        "v1",
+                        "webhooks",
+                        ":webhookId"
+                      ],
+                      "variable": [
+                        {
+                          "key": "webhookId",
+                          "value": "deserunt amet",
+                          "description": "(Required) ID do webhook"
+                        }
+                      ]
+                    }
+                  },
+                  "status": "No Content",
+                  "code": 204,
+                  "_postman_previewlanguage": "text",
+                  "header": [
+                    {
+                      "key": "Content-Type",
+                      "value": "text/plain"
+                    }
+                  ],
+                  "cookie": [],
+                  "body": ""
+                },
+                {
+                  "name": "Autenticação inválida",
+                  "originalRequest": {
+                    "method": "DELETE",
+                    "header": [
+                      {
+                        "description": "Added as a part of security scheme: oauth2",
+                        "key": "Authorization",
+                        "value": "<token>"
+                      }
+                    ],
+                    "url": {
+                      "raw": "{{baseUrl}}/v1/webhooks/:webhookId",
+                      "host": [
+                        "{{baseUrl}}"
+                      ],
+                      "path": [
+                        "v1",
+                        "webhooks",
+                        ":webhookId"
+                      ],
+                      "variable": [
+                        {
+                          "key": "webhookId",
+                          "value": "deserunt amet",
+                          "description": "(Required) ID do webhook"
+                        }
+                      ]
+                    }
+                  },
+                  "status": "Unauthorized",
+                  "code": 401,
+                  "_postman_previewlanguage": "text",
+                  "header": [
+                    {
+                      "key": "Content-Type",
+                      "value": "text/plain"
+                    }
+                  ],
+                  "cookie": [],
+                  "body": ""
+                },
+                {
+                  "name": "Webhook não existe",
+                  "originalRequest": {
+                    "method": "DELETE",
+                    "header": [
+                      {
+                        "description": "Added as a part of security scheme: oauth2",
+                        "key": "Authorization",
+                        "value": "<token>"
+                      }
+                    ],
+                    "url": {
+                      "raw": "{{baseUrl}}/v1/webhooks/:webhookId",
+                      "host": [
+                        "{{baseUrl}}"
+                      ],
+                      "path": [
+                        "v1",
+                        "webhooks",
+                        ":webhookId"
+                      ],
+                      "variable": [
+                        {
+                          "key": "webhookId",
+                          "value": "deserunt amet",
+                          "description": "(Required) ID do webhook"
+                        }
+                      ]
+                    }
+                  },
+                  "status": "Not Found",
+                  "code": 404,
+                  "_postman_previewlanguage": "text",
+                  "header": [
+                    {
+                      "key": "Content-Type",
+                      "value": "text/plain"
+                    }
+                  ],
+                  "cookie": [],
+                  "body": ""
+                },
+                {
+                  "name": "Erro interno do servidor",
+                  "originalRequest": {
+                    "method": "DELETE",
+                    "header": [
+                      {
+                        "description": "Added as a part of security scheme: oauth2",
+                        "key": "Authorization",
+                        "value": "<token>"
+                      }
+                    ],
+                    "url": {
+                      "raw": "{{baseUrl}}/v1/webhooks/:webhookId",
+                      "host": [
+                        "{{baseUrl}}"
+                      ],
+                      "path": [
+                        "v1",
+                        "webhooks",
+                        ":webhookId"
+                      ],
+                      "variable": [
+                        {
+                          "key": "webhookId",
+                          "value": "deserunt amet",
+                          "description": "(Required) ID do webhook"
+                        }
+                      ]
+                    }
+                  },
+                  "status": "Internal Server Error",
+                  "code": 500,
+                  "_postman_previewlanguage": "text",
+                  "header": [
+                    {
+                      "key": "Content-Type",
+                      "value": "text/plain"
+                    }
+                  ],
+                  "cookie": [],
+                  "body": ""
+                }
+              ]
+            }
+          ]
+        },
+        {
+          "name": "/v1/account",
+          "request": {
+            "method": "GET",
+            "header": [
+              {
+                "key": "Accept",
+                "value": "application/json"
+              }
+            ],
+            "url": {
+              "raw": "{{baseUrl}}/v1/account",
+              "host": [
+                "{{baseUrl}}"
+              ],
+              "path": [
+                "v1",
+                "account"
+              ]
+            },
+            "description": "Consultar conta"
+          },
+          "response": [
+            {
+              "name": "Retorna os dados da conta autenticada",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "description": "Added as a part of security scheme: oauth2",
+                    "key": "Authorization",
+                    "value": "<token>"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/v1/account",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "v1",
+                    "account"
+                  ]
+                }
+              },
+              "status": "OK",
+              "code": 200,
+              "_postman_previewlanguage": "json",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "application/json"
+                }
+              ],
+              "cookie": [],
+              "body": "{\n  \"data\": {\n    \"id\": \"61021c7bdabe5e001225b65b\",\n    \"email\": \"harry.potter@hogwarts.com\",\n    \"username\": \"harrypotter\",\n    \"displayName\": \"Harry Potter\",\n    \"avatar\": \"https://cdn.livepix.gg/profile/avatars/example.png\"\n  }\n}"
+            },
+            {
+              "name": "Autenticação inválida",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "description": "Added as a part of security scheme: oauth2",
+                    "key": "Authorization",
+                    "value": "<token>"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/v1/account",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "v1",
+                    "account"
+                  ]
+                }
+              },
+              "status": "Unauthorized",
+              "code": 401,
+              "_postman_previewlanguage": "text",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "text/plain"
+                }
+              ],
+              "cookie": [],
+              "body": ""
+            },
+            {
+              "name": "Erro interno do servidor",
+              "originalRequest": {
+                "method": "GET",
+                "header": [
+                  {
+                    "description": "Added as a part of security scheme: oauth2",
+                    "key": "Authorization",
+                    "value": "<token>"
+                  }
+                ],
+                "url": {
+                  "raw": "{{baseUrl}}/v1/account",
+                  "host": [
+                    "{{baseUrl}}"
+                  ],
+                  "path": [
+                    "v1",
+                    "account"
+                  ]
+                }
+              },
+              "status": "Internal Server Error",
+              "code": 500,
+              "_postman_previewlanguage": "text",
+              "header": [
+                {
+                  "key": "Content-Type",
+                  "value": "text/plain"
+                }
+              ],
+              "cookie": [],
+              "body": ""
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "auth": {
+    "type": "oauth2",
+    "oauth2": [
+      {
+        "key": "scope",
+        "value": "offline account:read rewards:read rewards:write messages:read messages:write subscriptions:read subscriptions:write wallet:read webhooks",
+        "type": "string"
+      },
+      {
+        "key": "client_authentication",
+        "value": "body",
+        "type": "string"
+      },
+      {
+        "key": "accessTokenUrl",
+        "value": "https://oauth.livepix.gg/oauth2/token",
+        "type": "string"
+      },
+      {
+        "key": "clientSecret",
+        "value": "{{clientSecret}}",
+        "type": "string"
+      },
+      {
+        "key": "clientId",
+        "value": "{{clientId}}",
+        "type": "string"
+      },
+      {
+        "key": "tokenName",
+        "value": "LivePix",
+        "type": "string"
+      },
+      {
+        "key": "grant_type",
+        "value": "client_credentials",
+        "type": "string"
+      },
+      {
+        "key": "authUrl",
+        "value": "",
+        "type": "string"
+      },
+      {
+        "key": "addTokenTo",
+        "value": "header",
+        "type": "string"
+      }
+    ]
+  },
+  "event": [
+    {
+      "listen": "prerequest",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          ""
+        ]
+      }
+    },
+    {
+      "listen": "test",
+      "script": {
+        "type": "text/javascript",
+        "exec": [
+          ""
+        ]
+      }
+    }
+  ],
+  "variable": [
+    {
+      "key": "baseUrl",
+      "value": "https://api.livepix.gg",
+      "type": "string"
+    },
+    {
+      "key": "clientId",
+      "value": "",
+      "type": "string"
+    },
+    {
+      "key": "clientSecret",
+      "value": "",
+      "type": "string"
+    }
+  ]
+}

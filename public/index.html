@@ -1,0 +1,433 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Top Musica LivePix</title>
+    <style>
+      :root {
+        --bg: #0b0f14;
+        --panel: rgba(255, 255, 255, 0.06);
+        --panel2: rgba(255, 255, 255, 0.085);
+        --text: rgba(255, 255, 255, 0.92);
+        --muted: rgba(255, 255, 255, 0.6);
+        --ok: #41d37d;
+        --warn: #f2c14e;
+        --bad: #ff5d5d;
+        --accent: #7ae6ff;
+        --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono",
+          "Courier New", monospace;
+        --sans: ui-sans-serif, system-ui, -apple-system, Segoe UI, Roboto, Arial, sans-serif;
+      }
+
+      html,
+      body {
+        height: 100%;
+      }
+
+      body {
+        margin: 0;
+        background: radial-gradient(1200px 800px at 20% -10%, rgba(122, 230, 255, 0.18), transparent 60%),
+          radial-gradient(900px 700px at 100% 0%, rgba(65, 211, 125, 0.12), transparent 55%),
+          linear-gradient(180deg, #070a0f, var(--bg));
+        color: var(--text);
+        font-family: var(--sans);
+      }
+
+      .wrap {
+        max-width: 1100px;
+        margin: 0 auto;
+        padding: 22px 16px 60px;
+      }
+
+      header {
+        display: flex;
+        gap: 10px;
+        align-items: baseline;
+        justify-content: space-between;
+        flex-wrap: wrap;
+        margin-bottom: 16px;
+      }
+
+      h1 {
+        margin: 0;
+        font-size: 18px;
+        letter-spacing: 0.2px;
+      }
+
+      .status {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        font-family: var(--mono);
+        font-size: 12px;
+        color: var(--muted);
+      }
+
+      .dot {
+        width: 8px;
+        height: 8px;
+        border-radius: 999px;
+        background: var(--bad);
+        box-shadow: 0 0 0 4px rgba(255, 93, 93, 0.12);
+      }
+
+      .dot.ok {
+        background: var(--ok);
+        box-shadow: 0 0 0 4px rgba(65, 211, 125, 0.12);
+      }
+
+      .grid {
+        display: grid;
+        grid-template-columns: 1fr;
+        gap: 12px;
+      }
+
+      @media (min-width: 920px) {
+        .grid {
+          grid-template-columns: 1.25fr 0.75fr;
+        }
+      }
+
+      .card {
+        background: linear-gradient(180deg, var(--panel2), var(--panel));
+        border: 1px solid rgba(255, 255, 255, 0.08);
+        border-radius: 14px;
+        overflow: hidden;
+      }
+
+      .card h2 {
+        margin: 0;
+        padding: 12px 12px 10px;
+        font-size: 13px;
+        letter-spacing: 0.28px;
+        text-transform: uppercase;
+        color: rgba(255, 255, 255, 0.72);
+        font-family: var(--mono);
+        border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+      }
+
+      .card .body {
+        padding: 12px;
+      }
+
+      .row {
+        display: flex;
+        gap: 10px;
+        align-items: center;
+        justify-content: space-between;
+        flex-wrap: wrap;
+      }
+
+      .pill {
+        font-family: var(--mono);
+        font-size: 12px;
+        color: rgba(255, 255, 255, 0.78);
+        background: rgba(255, 255, 255, 0.08);
+        border: 1px solid rgba(255, 255, 255, 0.12);
+        padding: 6px 10px;
+        border-radius: 999px;
+      }
+
+      .pill strong {
+        color: var(--accent);
+      }
+
+      .btns {
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+      }
+
+      button {
+        appearance: none;
+        border: 1px solid rgba(255, 255, 255, 0.14);
+        background: rgba(255, 255, 255, 0.08);
+        color: rgba(255, 255, 255, 0.92);
+        padding: 8px 10px;
+        border-radius: 10px;
+        font-family: var(--mono);
+        font-size: 12px;
+        cursor: pointer;
+      }
+
+      button:hover {
+        border-color: rgba(122, 230, 255, 0.35);
+        background: rgba(122, 230, 255, 0.12);
+      }
+
+      .muted {
+        color: var(--muted);
+        font-family: var(--mono);
+        font-size: 12px;
+      }
+
+      .list {
+        display: grid;
+        gap: 8px;
+      }
+
+      .item {
+        display: grid;
+        gap: 3px;
+        padding: 10px;
+        border-radius: 12px;
+        background: rgba(0, 0, 0, 0.18);
+        border: 1px solid rgba(255, 255, 255, 0.06);
+      }
+
+      .item .topline {
+        display: flex;
+        gap: 10px;
+        align-items: baseline;
+        justify-content: space-between;
+      }
+
+      .item .who {
+        font-family: var(--mono);
+        font-size: 12px;
+        color: rgba(255, 255, 255, 0.8);
+      }
+
+      .item .val {
+        font-family: var(--mono);
+        font-size: 12px;
+        color: rgba(255, 255, 255, 0.88);
+      }
+
+      .item .msg {
+        font-size: 13px;
+        color: rgba(255, 255, 255, 0.86);
+        line-height: 1.35;
+        word-break: break-word;
+      }
+
+      .item .meta {
+        display: flex;
+        gap: 6px;
+        flex-wrap: wrap;
+        font-family: var(--mono);
+        font-size: 11px;
+        color: rgba(255, 255, 255, 0.62);
+      }
+
+      .k {
+        color: rgba(255, 255, 255, 0.72);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <header>
+        <h1>Top Musica LivePix (Captando)</h1>
+        <div class="status">
+          <span id="dot" class="dot"></span>
+          <span id="conn">desconectado</span>
+          <span class="k">|</span>
+          <span id="rulesPath">rules: -</span>
+        </div>
+      </header>
+
+      <div class="grid">
+        <section class="card">
+          <h2>Doacoes</h2>
+          <div class="body">
+            <div class="row" style="margin-bottom: 10px">
+              <div class="pill">
+                Top: <strong id="topName">-</strong> <span id="topValue">R$ 0</span>
+              </div>
+              <div class="pill">
+                Player:
+                <strong id="playerStatus">-</strong>
+              </div>
+            </div>
+
+            <div class="list" id="donations"></div>
+            <div class="muted" id="donationsEmpty" style="margin-top: 10px">
+              Aguardando webhook...
+            </div>
+          </div>
+        </section>
+
+        <aside class="card">
+          <h2>Musica</h2>
+          <div class="body">
+            <div class="row" style="margin-bottom: 10px">
+              <div class="btns">
+                <button id="skipBtn">skip</button>
+                <button id="clearBtn">clear</button>
+                <button id="reloadBtn">reload rules</button>
+              </div>
+              <div class="muted" id="lastWebhook">-</div>
+            </div>
+
+            <div class="item" style="margin-bottom: 10px">
+              <div class="topline">
+                <div class="who" id="nowWho">Agora: -</div>
+                <div class="val" id="nowVal">-</div>
+              </div>
+              <div class="msg" id="nowMsg">Sem musica tocando</div>
+              <div class="meta" id="nowMeta"></div>
+            </div>
+
+            <div class="muted" style="margin-bottom: 6px">Fila</div>
+            <div class="list" id="queue"></div>
+            <div class="muted" id="queueEmpty" style="margin-top: 10px">
+              fila vazia
+            </div>
+          </div>
+        </aside>
+      </div>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+      const dot = document.getElementById("dot");
+      const conn = document.getElementById("conn");
+      const rulesPath = document.getElementById("rulesPath");
+
+      const donationsEl = document.getElementById("donations");
+      const donationsEmpty = document.getElementById("donationsEmpty");
+      const topName = document.getElementById("topName");
+      const topValue = document.getElementById("topValue");
+      const playerStatus = document.getElementById("playerStatus");
+
+      const skipBtn = document.getElementById("skipBtn");
+      const clearBtn = document.getElementById("clearBtn");
+      const reloadBtn = document.getElementById("reloadBtn");
+
+      const nowWho = document.getElementById("nowWho");
+      const nowVal = document.getElementById("nowVal");
+      const nowMsg = document.getElementById("nowMsg");
+      const nowMeta = document.getElementById("nowMeta");
+
+      const queueEl = document.getElementById("queue");
+      const queueEmpty = document.getElementById("queueEmpty");
+      const lastWebhook = document.getElementById("lastWebhook");
+
+      function formatBRL(v) {
+        try {
+          return new Intl.NumberFormat("pt-BR", {
+            style: "currency",
+            currency: "BRL"
+          }).format(Number(v) || 0);
+        } catch {
+          return `R$ ${Number(v) || 0}`;
+        }
+      }
+
+      function relTime(ts) {
+        if (!ts) return "-";
+        const d = Date.now() - Number(ts);
+        if (!Number.isFinite(d)) return "-";
+        if (d < 1000) return "agora";
+        if (d < 60_000) return `${Math.floor(d / 1000)}s`;
+        if (d < 3_600_000) return `${Math.floor(d / 60_000)}m`;
+        return `${Math.floor(d / 3_600_000)}h`;
+      }
+
+      function setState(state) {
+        const s = state || {};
+
+        if (s.topDonation) {
+          topName.textContent = s.topDonation.sender || "-";
+          topValue.textContent = formatBRL(s.topDonation.value);
+        } else {
+          topName.textContent = "-";
+          topValue.textContent = "R$ 0";
+        }
+
+        const p = s.player || {};
+        playerStatus.textContent =
+          p.connected && p.ready ? "ready" : p.connected ? "conectado" : "off";
+
+        const m = s.music || {};
+        const cur = m.current;
+        if (cur) {
+          nowWho.textContent = `Agora: ${cur.requestedBy || "-"}`;
+          nowVal.textContent = formatBRL(cur.value);
+          nowMsg.textContent = cur.url || cur.message || "-";
+          const meta = [];
+          if (cur.vip) meta.push("VIP");
+          if (cur.videoId) meta.push(`yt:${cur.videoId}`);
+          nowMeta.textContent = meta.join(" | ");
+        } else {
+          nowWho.textContent = "Agora: -";
+          nowVal.textContent = "-";
+          nowMsg.textContent = "Sem musica tocando";
+          nowMeta.textContent = "";
+        }
+
+        const q = Array.isArray(m.queue) ? m.queue : [];
+        queueEl.innerHTML = "";
+        for (const t of q.slice(0, 25)) {
+          const div = document.createElement("div");
+          div.className = "item";
+          div.innerHTML = `
+            <div class="topline">
+              <div class="who">${t.requestedBy || "-"}</div>
+              <div class="val">${formatBRL(t.value)}</div>
+            </div>
+            <div class="msg">${t.url || "-"}</div>
+            <div class="meta">${t.vip ? "VIP" : "fila"}${t.videoId ? " | yt:" + t.videoId : ""}</div>
+          `;
+          queueEl.appendChild(div);
+        }
+        queueEmpty.style.display = q.length ? "none" : "block";
+
+        const dons = Array.isArray(s.donations) ? s.donations : [];
+        donationsEl.innerHTML = "";
+        for (const d of dons.slice(0, 25)) {
+          const div = document.createElement("div");
+          div.className = "item";
+          const acts = (d.actions || []).map((a) => a.type).join(", ");
+          div.innerHTML = `
+            <div class="topline">
+              <div class="who">${d.sender || "-"}</div>
+              <div class="val">${formatBRL(d.value)}</div>
+            </div>
+            <div class="msg">${(d.message || "").replaceAll("<", "&lt;")}</div>
+            <div class="meta">
+              <span>${relTime(d.at)} atrás</span>
+              ${d.url ? `<span>url</span>` : ""}
+              ${acts ? `<span>actions: ${acts}</span>` : ""}
+            </div>
+          `;
+          donationsEl.appendChild(div);
+        }
+        donationsEmpty.style.display = dons.length ? "none" : "block";
+
+        lastWebhook.textContent = s.lastWebhookAt
+          ? `webhook: ${relTime(s.lastWebhookAt)} atrás`
+          : "webhook: -";
+      }
+
+      const socket = io();
+
+      socket.on("connect", () => {
+        dot.classList.add("ok");
+        conn.textContent = "conectado";
+      });
+      socket.on("disconnect", () => {
+        dot.classList.remove("ok");
+        conn.textContent = "desconectado";
+      });
+
+      socket.on("rules:loaded", (d) => {
+        if (d && d.path) rulesPath.textContent = `rules: ${d.path}`;
+      });
+      socket.on("rules:reloaded", (d) => {
+        if (d && d.path) rulesPath.textContent = `rules: ${d.path}`;
+      });
+
+      socket.on("state:init", (s) => setState(s));
+      socket.on("state:update", (s) => setState(s));
+
+      skipBtn.addEventListener("click", () => socket.emit("music:skip"));
+      clearBtn.addEventListener("click", () => socket.emit("music:clearQueue"));
+      reloadBtn.addEventListener("click", async () => {
+        await fetch("/api/rules/reload", { method: "POST" });
+      });
+    </script>
+  </body>
+</html>

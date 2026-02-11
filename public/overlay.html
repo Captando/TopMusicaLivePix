@@ -1,0 +1,177 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Top Musica Overlay</title>
+    <style>
+      :root {
+        --text: rgba(255, 255, 255, 0.92);
+        --muted: rgba(255, 255, 255, 0.72);
+        --bg: rgba(0, 0, 0, 0.45);
+        --stroke: rgba(255, 255, 255, 0.16);
+        --accent: #7ae6ff;
+        --ok: #41d37d;
+        --mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono",
+          "Courier New", monospace;
+      }
+
+      html,
+      body {
+        height: 100%;
+      }
+
+      body {
+        margin: 0;
+        background: transparent;
+        overflow: hidden;
+        font-family: var(--mono);
+        color: var(--text);
+      }
+
+      .box {
+        position: absolute;
+        left: 16px;
+        top: 16px;
+        width: min(720px, calc(100vw - 32px));
+        padding: 14px 14px 12px;
+        border-radius: 14px;
+        background: linear-gradient(180deg, rgba(0, 0, 0, 0.6), var(--bg));
+        border: 1px solid var(--stroke);
+        backdrop-filter: blur(10px);
+        box-shadow: 0 16px 40px rgba(0, 0, 0, 0.45);
+      }
+
+      .label {
+        font-size: 11px;
+        letter-spacing: 0.6px;
+        text-transform: uppercase;
+        color: rgba(255, 255, 255, 0.72);
+      }
+
+      .line {
+        margin-top: 6px;
+        font-size: 14px;
+        line-height: 1.3;
+        word-break: break-word;
+      }
+
+      .accent {
+        color: var(--accent);
+      }
+
+      .row {
+        margin-top: 10px;
+        display: flex;
+        gap: 10px;
+        flex-wrap: wrap;
+        color: var(--muted);
+        font-size: 12px;
+      }
+
+      .pill {
+        padding: 6px 10px;
+        border-radius: 999px;
+        border: 1px solid rgba(255, 255, 255, 0.14);
+        background: rgba(255, 255, 255, 0.06);
+      }
+
+      .dot {
+        display: inline-block;
+        width: 8px;
+        height: 8px;
+        border-radius: 999px;
+        background: #ff5d5d;
+        margin-right: 6px;
+        box-shadow: 0 0 0 4px rgba(255, 93, 93, 0.12);
+        vertical-align: -1px;
+      }
+
+      .dot.ok {
+        background: var(--ok);
+        box-shadow: 0 0 0 4px rgba(65, 211, 125, 0.12);
+      }
+    </style>
+  </head>
+  <body>
+    <div class="box">
+      <div class="label">Agora Tocando</div>
+      <div class="line" id="now">-</div>
+
+      <div class="row">
+        <div class="pill">
+          <span class="dot" id="dot"></span><span id="conn">socket off</span>
+        </div>
+        <div class="pill">Top: <span class="accent" id="top">-</span></div>
+      </div>
+    </div>
+
+    <audio id="sfx" preload="auto"></audio>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+      const nowEl = document.getElementById("now");
+      const topEl = document.getElementById("top");
+      const dot = document.getElementById("dot");
+      const conn = document.getElementById("conn");
+      const sfx = document.getElementById("sfx");
+
+      function formatBRL(v) {
+        try {
+          return new Intl.NumberFormat("pt-BR", {
+            style: "currency",
+            currency: "BRL"
+          }).format(Number(v) || 0);
+        } catch {
+          return `R$ ${Number(v) || 0}`;
+        }
+      }
+
+      function applyState(s) {
+        if (!s) return;
+        const cur = s.music?.current;
+        if (cur) {
+          nowEl.textContent = `${cur.vip ? "[VIP] " : ""}${cur.requestedBy || "-"} (${formatBRL(
+            cur.value
+          )})`;
+        } else {
+          nowEl.textContent = "-";
+        }
+
+        if (s.topDonation) {
+          topEl.textContent = `${s.topDonation.sender || "-"} (${formatBRL(s.topDonation.value)})`;
+        } else {
+          topEl.textContent = "-";
+        }
+      }
+
+      const socket = io();
+      socket.on("connect", () => {
+        dot.classList.add("ok");
+        conn.textContent = "socket ok";
+      });
+      socket.on("disconnect", () => {
+        dot.classList.remove("ok");
+        conn.textContent = "socket off";
+      });
+
+      socket.on("state:init", (s) => applyState(s));
+      socket.on("state:update", (s) => applyState(s));
+
+      socket.on("sfx:play", async (p) => {
+        try {
+          const src = String(p?.src || "").trim();
+          if (!src) return;
+          const vol = Number(p?.volume);
+          if (Number.isFinite(vol)) sfx.volume = Math.max(0, Math.min(1, vol));
+          sfx.pause();
+          sfx.src = src;
+          sfx.currentTime = 0;
+          await sfx.play();
+        } catch {
+          // ignore
+        }
+      });
+    </script>
+  </body>
+</html>

@@ -1,0 +1,106 @@
+const fs = require("node:fs");
+const path = require("node:path");
+
+const dotenv = require("dotenv");
+
+const { warn } = require("./logger");
+
+dotenv.config();
+
+function env(key, fallback) {
+  const v = process.env[key];
+  if (v === undefined || v === null || v === "") return fallback;
+  return v;
+}
+
+function envInt(key, fallback) {
+  const v = env(key, "");
+  const n = Number.parseInt(String(v), 10);
+  return Number.isFinite(n) ? n : fallback;
+}
+
+function envCsv(key, fallbackArr) {
+  const v = env(key, "");
+  if (!v) return fallbackArr;
+  return String(v)
+    .split(",")
+    .map((s) => s.trim().toLowerCase())
+    .filter(Boolean);
+}
+
+function loadRules(rulesPath) {
+  const abs = path.isAbsolute(rulesPath)
+    ? rulesPath
+    : path.join(process.cwd(), rulesPath);
+
+  try {
+    const raw = fs.readFileSync(abs, "utf8");
+    const json = JSON.parse(raw);
+
+    if (!json || typeof json !== "object") {
+      throw new Error("rules.json must be an object");
+    }
+    if (!Array.isArray(json.rules)) {
+      throw new Error("rules.json must contain a 'rules' array");
+    }
+
+    return { absPath: abs, data: json };
+  } catch (e) {
+    warn(`Failed to load rules from ${abs}: ${e.message}`);
+    return {
+      absPath: abs,
+      data: { urlWhitelist: [], cooldowns: {}, rules: [] }
+    };
+  }
+}
+
+function getConfig() {
+  const rulesPath = env("RULES_PATH", "config/rules.json");
+
+  return {
+    host: env("HOST", "127.0.0.1"),
+    port: envInt("PORT", 3000),
+    webhookSecret: env("WEBHOOK_SECRET", ""),
+    webhookRateLimit: {
+      windowMs: envInt("WEBHOOK_RATE_LIMIT_WINDOW_MS", 60_000),
+      max: envInt("WEBHOOK_RATE_LIMIT_MAX", 60)
+    },
+
+    livepix: {
+      valuePath: env("LIVEPIX_VALUE_PATH", ""),
+      messagePath: env("LIVEPIX_MESSAGE_PATH", ""),
+      senderPath: env("LIVEPIX_SENDER_PATH", ""),
+      statusPath: env("LIVEPIX_STATUS_PATH", ""),
+      acceptedStatuses: envCsv("LIVEPIX_ACCEPTED_STATUSES", [
+        "paid",
+        "confirmed",
+        "approved",
+        "completed"
+      ])
+    },
+
+    livepixApi: {
+      accessToken: env("LIVEPIX_ACCESS_TOKEN", ""),
+      clientId: env("LIVEPIX_CLIENT_ID", ""),
+      clientSecret: env("LIVEPIX_CLIENT_SECRET", ""),
+      scope: env("LIVEPIX_SCOPE", "messages:read subscriptions:read"),
+      apiBaseUrl: env("LIVEPIX_API_BASE_URL", "https://api.livepix.gg"),
+      oauthTokenUrl: env("LIVEPIX_OAUTH_TOKEN_URL", "https://oauth.livepix.gg/oauth2/token")
+    },
+
+    minecraft: {
+      host: env("RCON_HOST", "127.0.0.1"),
+      port: envInt("RCON_PORT", 25575),
+      password: env("RCON_PASSWORD", "")
+    },
+
+    music: {
+      interruptBehavior: env("MUSIC_INTERRUPT_BEHAVIOR", "drop")
+    },
+
+    rulesPath,
+    loadRules
+  };
+}
+
+module.exports = { getConfig, loadRules };

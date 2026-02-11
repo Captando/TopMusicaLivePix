@@ -1,0 +1,62 @@
+{
+  "urlWhitelist": ["youtube.com", "www.youtube.com", "youtu.be", "music.youtube.com"],
+  "cooldowns": {
+    "music.playNow": 0,
+    "music.enqueue": 0,
+    "minecraft.rcon": 2500,
+    "minecraft.rconMulti": 60000
+  },
+  "rules": [
+    {
+      "id": "music-vip",
+      "enabled": true,
+      "priority": 100,
+      "when": { "minValue": 20, "hasUrl": true },
+      "actions": [{ "type": "music.playNow", "vip": true }]
+    },
+    {
+      "id": "new-top-example",
+      "enabled": false,
+      "priority": 90,
+      "when": { "minValue": 1, "isNewTop": true },
+      "actions": [{ "type": "sfx.play", "src": "/sfx/novo-top.mp3", "volume": 1 }]
+    },
+    {
+      "id": "music-queue",
+      "enabled": true,
+      "priority": 50,
+      "when": { "minValue": 10, "hasUrl": true },
+      "actions": [{ "type": "music.enqueue" }]
+    },
+    {
+      "id": "mc-creeper",
+      "enabled": true,
+      "priority": 10,
+      "when": { "minValue": 5, "keywordsAny": ["creeper"] },
+      "actions": [
+        { "type": "minecraft.rcon", "command": "/summon minecraft:creeper ~ ~ ~" }
+      ]
+    },
+    {
+      "id": "mc-nuke",
+      "enabled": true,
+      "priority": 20,
+      "when": { "minValue": 50, "keywordsAny": ["nuke"] },
+      "actions": [
+        {
+          "type": "minecraft.rconMulti",
+          "command": "/summon minecraft:tnt ~ ~ ~",
+          "count": 12,
+          "intervalMs": 150
+        }
+      ]
+    },
+    {
+      "id": "sfx-susto",
+      "enabled": false,
+      "priority": 80,
+      "when": { "minValue": 2, "keywordsAny": ["susto"] },
+      "actions": [{ "type": "sfx.play", "src": "/sfx/susto.mp3", "volume": 1 }]
+    }
+  ]
+}

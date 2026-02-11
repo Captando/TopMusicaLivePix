@@ -1,0 +1,147 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Top Musica Player</title>
+    <style>
+      html,
+      body {
+        height: 100%;
+      }
+      body {
+        margin: 0;
+        background: #000;
+        overflow: hidden;
+        font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono",
+          "Courier New", monospace;
+        color: rgba(255, 255, 255, 0.85);
+      }
+      #player {
+        position: absolute;
+        inset: 0;
+      }
+      .hud {
+        position: absolute;
+        left: 14px;
+        bottom: 14px;
+        padding: 10px 12px;
+        border-radius: 12px;
+        background: rgba(0, 0, 0, 0.55);
+        border: 1px solid rgba(255, 255, 255, 0.14);
+        backdrop-filter: blur(8px);
+        max-width: min(820px, calc(100vw - 28px));
+      }
+      .title {
+        font-size: 12px;
+        letter-spacing: 0.3px;
+        text-transform: uppercase;
+        color: rgba(255, 255, 255, 0.7);
+        margin-bottom: 6px;
+      }
+      .line {
+        font-size: 13px;
+        line-height: 1.3;
+        word-break: break-word;
+      }
+      .muted {
+        color: rgba(255, 255, 255, 0.55);
+        font-size: 12px;
+        margin-top: 6px;
+      }
+    </style>
+  </head>
+  <body>
+    <div id="player"></div>
+    <div class="hud">
+      <div class="title">Top Musica Player</div>
+      <div class="line" id="now">Aguardando...</div>
+      <div class="muted" id="status">socket: - | yt: -</div>
+    </div>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="https://www.youtube.com/iframe_api"></script>
+    <script>
+      const nowEl = document.getElementById("now");
+      const statusEl = document.getElementById("status");
+
+      let socketReady = false;
+      let ytReady = false;
+      let currentTrack = null;
+      let player = null;
+
+      function setStatus() {
+        statusEl.textContent = `socket: ${socketReady ? "ok" : "off"} | yt: ${
+          ytReady ? "ok" : "off"
+        }`;
+      }
+
+      const socket = io({ query: { role: "player" } });
+      socket.on("connect", () => {
+        socketReady = true;
+        setStatus();
+        if (ytReady) socket.emit("player:ready");
+      });
+      socket.on("disconnect", () => {
+        socketReady = false;
+        setStatus();
+      });
+
+      socket.on("music:play", (track) => {
+        currentTrack = track || null;
+        const label = track
+          ? `${track.vip ? "[VIP] " : ""}${track.requestedBy || "-"}: ${track.url || ""}`
+          : "Aguardando...";
+        nowEl.textContent = label;
+
+        if (!track || !track.videoId || !player) return;
+        try {
+          player.loadVideoById({ videoId: track.videoId });
+        } catch {
+          socket.emit("player:ended");
+        }
+      });
+
+      socket.on("music:stop", () => {
+        currentTrack = null;
+        nowEl.textContent = "Sem musica";
+        try {
+          player?.stopVideo?.();
+        } catch {}
+      });
+
+      function onYouTubeIframeAPIReady() {
+        // Called by the YouTube script.
+        player = new YT.Player("player", {
+          width: "100%",
+          height: "100%",
+          playerVars: {
+            autoplay: 1,
+            controls: 0,
+            modestbranding: 1,
+            rel: 0,
+            playsinline: 1
+          },
+          events: {
+            onReady: () => {
+              ytReady = true;
+              setStatus();
+              if (socketReady) socket.emit("player:ready");
+            },
+            onStateChange: (ev) => {
+              if (ev.data === YT.PlayerState.ENDED) {
+                socket.emit("player:ended");
+              }
+            },
+            onError: () => {
+              socket.emit("player:ended");
+            }
+          }
+        });
+      }
+      window.onYouTubeIframeAPIReady = onYouTubeIframeAPIReady;
+
+      setStatus();
+    </script>
+  </body>
+</html>
