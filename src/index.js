@@ -20,8 +20,9 @@ const { decideActions, parseDonationContext } = require("./rules");
 const { AppState } = require("./state");
 const { MinecraftRcon } = require("./actions/minecraft");
 const { MusicManager } = require("./actions/music");
+const { ObsController } = require("./actions/obs");
 const { LivePixApi } = require("./livepixApi");
-const { newId } = require("./utils");
+const { formatBRL, newId, renderTemplate } = require("./utils");
 const { createVersionService } = require("./version");
 
 function openUrl(url) {
@@ -66,6 +67,7 @@ async function main() {
   });
 
   const minecraft = new MinecraftRcon(cfg.minecraft);
+  const obs = new ObsController(cfg.obs);
   const version = createVersionService({
     owner: "Captando",
     repo: "TopMusicaLivePix",
@@ -169,6 +171,38 @@ async function main() {
         if (!src) return { ok: false, reason: "missing_src" };
         io.emit("sfx:play", { src, volume: action.volume });
         return { ok: true };
+      }
+      case "obs.setCurrentProgramScene": {
+        return obs.setCurrentProgramScene(action.sceneName);
+      }
+      case "obs.setSceneItemEnabled": {
+        return obs.setSceneItemEnabled(action.sceneName, action.sourceName, action.enabled);
+      }
+      case "obs.enableSourceForMs": {
+        return obs.enableSourceForMs(action.sceneName, action.sourceName, action.durationMs);
+      }
+      case "obs.setText": {
+        const inputName = action.inputName;
+        const tpl = String(action.text || "");
+        const text = renderTemplate(tpl, {
+          sender: donation.sender,
+          value: donation.value,
+          valueBRL: formatBRL(donation.value),
+          message: donation.message,
+          url: ctx.url || "",
+          videoId: ctx.videoId || "",
+          isNewTop: ctx.isNewTop ? "true" : "false"
+        });
+        return obs.setText(inputName, text, { overlay: action.overlay !== false });
+      }
+      case "obs.mediaRestart": {
+        return obs.triggerMediaRestart(action.inputName);
+      }
+      case "obs.setInputMute": {
+        return obs.setInputMute(action.inputName, action.mute);
+      }
+      case "obs.setInputVolume": {
+        return obs.setInputVolumeMul(action.inputName, action.volumeMul);
       }
       default:
         return { ok: false, reason: `unknown_action:${action.type}` };
@@ -385,6 +419,7 @@ async function main() {
   const shutdown = async () => {
     log("Shutting down...");
     await minecraft.close();
+    await obs.close();
     process.exit(0);
   };
   process.on("SIGINT", shutdown);

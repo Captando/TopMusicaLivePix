@@ -4,7 +4,14 @@
     "music.playNow": 0,
     "music.enqueue": 0,
     "minecraft.rcon": 2500,
-    "minecraft.rconMulti": 60000
+    "minecraft.rconMulti": 60000,
+    "obs.setCurrentProgramScene": 1000,
+    "obs.setSceneItemEnabled": 250,
+    "obs.enableSourceForMs": 0,
+    "obs.setText": 250,
+    "obs.mediaRestart": 500,
+    "obs.setInputMute": 250,
+    "obs.setInputVolume": 250
   },
   "rules": [
     {
@@ -13,6 +20,25 @@
       "priority": 100,
       "when": { "minValue": 20, "hasUrl": true },
       "actions": [{ "type": "music.playNow", "vip": true }]
+    },
+    {
+      "id": "obs-alert-example",
+      "enabled": false,
+      "priority": 95,
+      "when": { "minValue": 5 },
+      "actions": [
+        {
+          "type": "obs.setText",
+          "inputName": "alert_text",
+          "text": "Obrigado {{sender}}! Doacao: {{valueBRL}}"
+        },
+        {
+          "type": "obs.enableSourceForMs",
+          "sceneName": "Cena Principal",
+          "sourceName": "ALERTA_BOX",
+          "durationMs": 4000
+        }
+      ]
     },
     {
       "id": "new-top-example",

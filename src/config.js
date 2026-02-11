@@ -19,6 +19,15 @@ function envInt(key, fallback) {
   return Number.isFinite(n) ? n : fallback;
 }
 
+function envBool(key, fallback) {
+  const v = env(key, "");
+  if (v === "") return fallback;
+  const s = String(v).trim().toLowerCase();
+  if (["1", "true", "yes", "y", "on"].includes(s)) return true;
+  if (["0", "false", "no", "n", "off"].includes(s)) return false;
+  return fallback;
+}
+
 function envCsv(key, fallbackArr) {
   const v = env(key, "");
   if (!v) return fallbackArr;
@@ -96,6 +105,12 @@ function getConfig() {
 
     music: {
       interruptBehavior: env("MUSIC_INTERRUPT_BEHAVIOR", "drop")
+    },
+
+    obs: {
+      enabled: envBool("OBS_WS_ENABLED", false),
+      url: env("OBS_WS_URL", "ws://127.0.0.1:4455"),
+      password: env("OBS_WS_PASSWORD", "")
     },
 
     rulesPath,

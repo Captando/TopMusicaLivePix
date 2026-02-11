@@ -109,15 +109,42 @@ function newId(prefix) {
   return `${prefix}_${Date.now()}_${Math.random().toString(16).slice(2)}`;
 }
 
+function formatBRL(value) {
+  const n = Number(value) || 0;
+  try {
+    return new Intl.NumberFormat("pt-BR", {
+      style: "currency",
+      currency: "BRL"
+    }).format(n);
+  } catch {
+    return `R$ ${n.toFixed(2)}`;
+  }
+}
+
+function renderTemplate(template, vars) {
+  const s = String(template || "");
+  const ctx = vars && typeof vars === "object" ? vars : {};
+
+  return s.replace(/{{\s*([a-zA-Z0-9_.-]+)\s*}}/g, (_, key) => {
+    const k = String(key || "").trim();
+    if (!k) return "";
+    const v = ctx[k];
+    if (v === undefined || v === null) return "";
+    return String(v);
+  });
+}
+
 module.exports = {
   asNumber,
   clampInt,
   extractFirstUrl,
   firstDefined,
+  formatBRL,
   getByPath,
   isWhitelistedUrl,
   newId,
   normalizeText,
   parseYoutubeVideoId,
+  renderTemplate,
   sleep
 };

@@ -2,6 +2,10 @@
 
 Este projeto segue (aproximadamente) SemVer.
 
+## v1.1.0 (2026-02-11)
+
+- Integração com OBS WebSocket (trocar de cena, habilitar/desabilitar fonte, atualizar texto, reiniciar Media Source)
+
 ## v1.0.1 (2026-02-11)
 
 - Dashboard agora compara versão pelo `package.json` remoto (evita falso "update disponível" por commit de merge)

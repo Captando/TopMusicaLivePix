@@ -147,6 +147,12 @@ Música:
 
 - `MUSIC_INTERRUPT_BEHAVIOR`: `drop` (padrão) ou `resume`
 
+OBS WebSocket:
+
+- `OBS_WS_ENABLED`: `true/false`
+- `OBS_WS_URL`: normalmente `ws://127.0.0.1:4455`
+- `OBS_WS_PASSWORD`: senha configurada no OBS
+
 Regras:
 
 - `RULES_PATH`: caminho do arquivo de regras (padrão: `config/rules.json`)
@@ -174,6 +180,37 @@ npm start
 3. Para a música, habilite a opção do Browser Source que permite o áudio ser controlado pelo OBS (nome varia por versão)
 
 Observação: algumas configurações do YouTube podem exigir interação inicial (abrir a página 1 vez) para permitir autoplay com áudio.
+
+## OBS WebSocket (controle de cenas e fontes)
+
+Se você quiser que as doações liguem/desliguem fontes, troquem de cena, atualizem texto, etc, use o **OBS WebSocket**.
+
+### 1) Ativar no OBS
+
+OBS 28+ (já vem embutido):
+
+1. OBS -> `Tools` -> `WebSocket Server Settings`
+2. Marque `Enable WebSocket server`
+3. Defina uma senha (recomendado)
+4. Porta padrão: `4455`
+
+### 2) Configurar no `.env`
+
+```env
+OBS_WS_ENABLED=true
+OBS_WS_URL=ws://127.0.0.1:4455
+OBS_WS_PASSWORD=SUA_SENHA_AQUI
+```
+
+### 3) Exemplo de regra
+
+No `config/rules.json` já existe uma regra desativada chamada `obs-alert-example`.
+Ela faz:
+
+- `obs.setText` em um input de texto (ex: `alert_text`)
+- `obs.enableSourceForMs` para mostrar uma fonte por alguns segundos (ex: `ALERTA_BOX` na `Cena Principal`)
+
+Os nomes (`sceneName`, `sourceName`, `inputName`) precisam ser exatamente os nomes que aparecem no OBS.
 
 ## Expor o webhook com segurança (ngrok)
 
@@ -300,6 +337,13 @@ O motor de regras faz:
 - `minecraft.rconMulti`
 - `system.openUrl` (abre a URL whitelisted no browser)
 - `sfx.play` (toca um áudio no overlay, ex: `/sfx/susto.mp3`)
+- `obs.setCurrentProgramScene`
+- `obs.setSceneItemEnabled`
+- `obs.enableSourceForMs`
+- `obs.setText` (aceita template: `{{sender}}`, `{{value}}`, `{{valueBRL}}`, `{{message}}`, `{{url}}`)
+- `obs.mediaRestart` (reinicia um Media Source)
+- `obs.setInputMute`
+- `obs.setInputVolume` (usa `volumeMul`, ex: 1.0 = 100%)
 
 Para SFX:
 
